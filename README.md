@@ -1,9 +1,9 @@
 # Loudmoauth
 
-`Loudmoauth` is ment to be a library for managing ouath2 client tokens independt of what service one is using.
+Loudmoauth is ment to be a library for managing ouath2 client tokens independently of what service one is using.
 
 ## Usage
-Supply a `map` with the following parameters:
+Supply a map with the following keys:
   ```Clojure
   {:base-url "https://www.example.com"
   :client-id "34jfkdl3...4fjdl2"
@@ -16,8 +16,8 @@ as an argument to the `set-oauth-params` function.
 
 To retrieve your token call the `token` function.
 
-### Custom query parameters
-Some services gives the client the ability to include custom query parameters. If you need this include them in themap associated with they key `:custom-query-params`.  
+### Custom query parameters `:custom-query-params`
+If the oauth2 service provider demands or gives you the possibility of any custom query parameters please include them in the map associated with the key `:custom-query-params`. This key is optional, so feel free to leave it out.
 
 ### When the token expires
 Loudmoauth tries to update your token for you whenever the token has reached its expiry time.
