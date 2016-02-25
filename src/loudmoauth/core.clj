@@ -9,6 +9,7 @@
 ;TODO - Deal with errors and exceptions
 ;TODO - Deal with missing :redirect-uri key, if that is possible?
 ;TODO - Make the oauth-params map accept keys on this format :client-id instead of :client_id.
+;TODO - Go over doc strings one more time.
 
 (def code-chan (a/chan))
 
