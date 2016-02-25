@@ -1,6 +1,6 @@
-(ns badmoauth.core-test
+(ns loudmoauth.core-test
   (:require [clojure.test :refer :all]
-            [badmoauth.core :refer :all]
+            [loudmoauth.core :refer :all]
             [clojure.core.async :as a]
             [clj-http.fake :refer :all]))
 

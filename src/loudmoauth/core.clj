@@ -1,4 +1,4 @@
-(ns badmoauth.core
+(ns loudmoauth.core
   (:require [clojure.string :as str]
             [clojure.core.async :as a]
             [clojure.data.codec.base64 :as b64]
