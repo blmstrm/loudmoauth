@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/blmstrm/loudmoauth.svg?branch=master)](https://travis-ci.org/blmstrm/loudmoauth)
 [![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
 # Loudmoauth
 Loudmoauth is ment to be a library for managing ouath2 client tokens independently of what service one is using.
