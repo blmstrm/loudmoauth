@@ -1,8 +1,10 @@
+[![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
 # Loudmoauth
-
 Loudmoauth is ment to be a library for managing ouath2 client tokens independently of what service one is using.
 
 ## Usage
+
+###Set the oauth2 parameters `set-oauth-params`
 Supply a map with the following keys:
   ```Clojure
   {:base-url "https://www.example.com"
@@ -14,10 +16,13 @@ Supply a map with the following keys:
 ```
 as an argument to the `set-oauth-params` function.
 
+###Retrieve your token
 To retrieve your token call the `token` function.
 
-### Custom query parameters `:custom-query-params`
+#### Custom query parameters `:custom-query-params`
 If the oauth2 service provider demands or gives you the possibility of any custom query parameters please include them in the map associated with the key `:custom-query-params`. This key is optional, so feel free to leave it out.
+
+
 
 ### When the token expires
 Loudmoauth tries to update your token for you whenever the token has reached its expiry time.
