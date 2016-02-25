@@ -6,6 +6,10 @@
             [clj-http.util :as util]
             [clj-http.client :as client]))
 
+;TODO - Deal with errors and exceptions
+;TODO - Deal with missing :redirect-uri key, if that is possible?
+;TODO - Make the oauth-params map accept keys on this format :client-id instead of :client_id.
+
 (def code-chan (a/chan))
 
 (def app-state (atom {}))
