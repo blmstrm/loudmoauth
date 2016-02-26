@@ -19,6 +19,7 @@
 
 (def query-params [:client-id :response-type :redirect-uri :scope :state])
 
+;TODO - Should omit bringing in the vals here?
 (defn change-keys 
   "Change hyphen to underscore in param map keys."
   [params]
