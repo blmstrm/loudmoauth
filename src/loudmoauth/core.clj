@@ -8,8 +8,8 @@
 
 ;TODO - Deal with errors and exceptions
 ;TODO - Deal with missing :redirect-uri key, if that is possible?
-;TODO - Make the oauth-params map accept keys on this format :client-id instead of :client_id.
 ;TODO - Go over doc strings one more time.
+;TODO - Uniform keys all over.
 
 (def code-chan (a/chan))
 
@@ -17,7 +17,17 @@
 
 (defn uuid [] (str (java.util.UUID/randomUUID)))
 
-(def query-params [:client_id :response_type :redirect_uri :scope :state])
+(def query-params [:client-id :response-type :redirect-uri :scope :state])
+
+(defn change-keys 
+  "Change hyphen to underscore in param map keys."
+  [params]
+  (if-not params
+    nil
+  (let [ks (keys params)
+        vs (vals params)
+        new-keys (map #(keyword (str/replace (name %) "-" "_")) ks)]
+    (zipmap new-keys vs))))
 
 (defn query-param-string 
   "Get query-param string from query parameter map."
@@ -25,12 +35,13 @@
   (->>
     (:custom-query-params astate)
     (merge (select-keys astate query-params))
+    (change-keys)
     (client/generate-query-string)))
 
 (defn add-response-type
   "Adds response type rtype to state mape astate"
   [rtype astate]
-  (assoc astate :response_type rtype))
+  (assoc astate :response-type rtype))
 
 (defn add-state
   "Adds unique state-id to state map astate."
@@ -62,7 +73,7 @@
 (defn encoded-auth-string
   "Create and encode credentials string for use in header."
   [astate]
-  (str "Basic " (string-to-base64-string (str (:client_id astate) ":" (:client_secret astate)))))
+  (str "Basic " (string-to-base64-string (str (:client-id astate) ":" (:client-secret astate)))))
 
 (defn add-encoded-auth-string
   "Add encoded credential string to state map."
@@ -74,7 +85,7 @@
   [astate]
   {:grant_type "authorization_code" 
    :code (:code astate)
-   :redirect_uri (:redirect_uri astate)})
+   :redirect_uri (:redirect-uri astate)})
 
 (defn add-tokens-to-state-map
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
@@ -117,7 +128,7 @@
 (defn token-url
   "Build the url for retreieving tokens."
   [astate]
-  (str (:base_url astate) "/api/token"))
+  (str (:base-url astate) "/api/token"))
 
 (defn build-token-url
   "Build token url."
@@ -127,7 +138,7 @@
 (defn auth-url
   "Build the authorization url."
   [astate]
-  (str (:base_url astate) "/authorize/?" (query-param-string astate)))
+  (str (:base-url astate) "/authorize/?" (query-param-string astate)))
 
 (defn build-auth-url
   "Build oauth-url."
@@ -165,7 +176,7 @@
   [params]
   (let [old-app-state @app-state]
   (->>
-    (if-not (:response_type params)
+    (if-not (:response-type params)
       (add-response-type "code" params)
       params)
     (add-state) 

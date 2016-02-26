@@ -27,34 +27,34 @@
 (def test-code-http-response {:status 200 :headers {} :body {} :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil :params {:state "34fFs29kd09" :code "abcdefghijklmn123456789"}})
 
 (def start-state-map
-  {:base_url "https://www.example.com"
-   :client_id "5fe01282e44241328a84e7c5cc169165"
-   :redirect_uri "https://www.example.com/callback"
+  {:base-url "https://www.example.com"
+   :client-id "5fe01282e44241328a84e7c5cc169165"
+   :redirect-uri "https://www.example.com/callback"
    :scope "user-read-private user-read-email"
-   :custom-query-params {:show_dialog "true"}
-   :client_secret "123456789secret"})
+   :custom-query-params {:show-dialog "true"}
+   :client-secret "123456789secret"})
 
  (def middle-state-map 
-  {:base_url "https://www.example.com"
-   :client_id "5fe01282e44241328a84e7c5cc169165"
-   :response_type "code"
-   :redirect_uri "https://www.example.com/callback"
+  {:base-url "https://www.example.com"
+   :client-id "5fe01282e44241328a84e7c5cc169165"
+   :response-type "code"
+   :redirect-uri "https://www.example.com/callback"
    :scope "user-read-private user-read-email"
    :state "34fFs29kd09"
-   :custom-query-params {:show_dialog "true"}
-   :client_secret "123456789secret"
+   :custom-query-params {:show-dialog "true"}
+   :client-secret "123456789secret"
    :encoded-auth-string test-enc-auth-string 
    })
 
 (def final-state-map
-  {:base_url "https://www.example.com"
-   :client_id "5fe01282e44241328a84e7c5cc169165"
-   :response_type "code"
-   :redirect_uri "https://www.example.com/callback"
+  {:base-url "https://www.example.com"
+   :client-id "5fe01282e44241328a84e7c5cc169165"
+   :response-type "code"
+   :redirect-uri "https://www.example.com/callback"
    :scope "user-read-private user-read-email"
    :state "34fFs29kd09"
-   :custom-query-params {:show_dialog "true"}
-   :client_secret "123456789secret"
+   :custom-query-params {:show-dialog "true"}
+   :client-secret "123456789secret"
    :encoded-auth-string test-enc-auth-string 
    :code "abcdefghijklmn123456789"
    :token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil} 
