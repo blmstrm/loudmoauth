@@ -1,33 +1,49 @@
 [![Build Status](https://travis-ci.org/blmstrm/loudmoauth.svg?branch=master)](https://travis-ci.org/blmstrm/loudmoauth)
 [![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
 # Loudmoauth
-Loudmoauth is ment to be a library for managing ouath2 client tokens independently of what service one is using.
+Loudmoauth is a general ouath2 client library. 
 
-## Usage
-###Set the oauth2 parameters 
-Supply a map with the following keys:
+##Quickstart
+To use `loudmoauth` with Leiningen or Boot include `[loudmoauth.core "0.1.0"]`.
+
+Require `loudmoauth` in your application:
+```Clojure
+(ns my-app.core
+  (:require [loudmoauth.core :as lmoauth]))
+```
+Start with creating a map with the specific parameters regarding your oauth2 service provider:
   ```Clojure
-  {:base-url "https://www.example.com"
+  (def ouath-map {:base-url "https://www.example.com"
   :client-id "34jfkdl3...4fjdl2"
   :redirect-uri "https://www.example.com/callback"
   :scope "do-one-thing do-another-thing"
   :custom-query-params {:likes-cake "Yes"}
-  :client-secret "23dj2k3k23kd...2312323s2s"}
+  :client-secret "23dj2k3k23kd...2312323s2s"})
 ```
-as an argument to the `set-oauth-params` function.
+Configure your http-request handler to call the function `parse-code` when the url  specified for `:redirect-uri` is called. The example below uses a ring handler:
 
-###Callback during the oauth cycle.
-If you have specified a `:redirect-uri` be sure to relay that response to
-the `parse-code` function. It expects a ring style response map.
-
-###Retrieve your token
+Pass the map specified earlier as an argument to the `set-oauth-params` function.
+```Clojure
+(lmoauth/set-oauth-params oauth-map)
+```
 To retrieve your token call the `token` function.
+```Clojure
+(lmouath/token)
+```
+This should be it. For a more detailed explanation see below. For working examples see the repository [loudmoauth-examples](https://github.com/blmstrm/loudmoauth-examples).
 
-#### Custom query parameters `:custom-query-params`
-If the oauth2 service provider demands or gives you the possibility of any custom query parameters please include them in the map associated with the key `:custom-query-params`. This key is optional, so feel free to leave it out.
+##In-depth documentation
+##oauth-params map
+###`:base-url`
+###`:client-id`
+###`:redirect-uri`
+###`:scope`
+###`:custom-query-params`
+###`:client-secret`
 
-### When the token expires
-Loudmoauth tries to update your token for you whenever the token has reached its expiry time.
+##When the token expires
+
+##Exception handling
 
 ## License
 The MIT License (MIT)
