@@ -50,6 +50,7 @@
   (assoc astate :state (uuid)))
 
 ;This is the handlers function to call after receiving callback to specified url.
+;TODO - Deal with cases where token is nil. If so don't put on channel.
 (defn parse-code
   "Parse code from http-response and deliver promise."
   [response]
