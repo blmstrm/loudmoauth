@@ -190,5 +190,4 @@
 (defn oauth-token
   "Retreive oauth token for use in authentication call"
   []
-  (when-not (:access_token @app-state) (init))
   (:access_token @app-state))
