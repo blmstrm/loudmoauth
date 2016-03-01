@@ -10,6 +10,7 @@
 ;TODO - Deal with missing :redirect-uri key, if that is possible?
 ;TODO - Go over doc strings one more time.
 ;TODO - Uniform keys all over.
+;TODO - Crap, we need to let the user authenticate. Don't put the get auth code on a future.
 
 (def code-chan (a/chan))
 
@@ -64,7 +65,7 @@
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."
   [astate]
-  (future (client/get (:auth-url astate)))
+  (client/get (:auth-url astate))
   (assoc astate :code (a/<!! code-chan)))
 
 (defn string-to-base64-string
