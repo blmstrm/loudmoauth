@@ -86,6 +86,7 @@
 
 (deftest test-fetch-code
   (testing "Test issuing http get for auth-code from oauth provider."
+    (future (a/>!! code-chan (:code final-state-map)))
     (with-fake-routes
       {(:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
       (is (= final-state-map (fetch-code final-state-map))))))
@@ -157,6 +158,7 @@
 
 (deftest test-request-access-to-data
   (testing "Build auth url and fetch code."
+    (future (a/>!! code-chan (:code final-state-map)))
     (with-fake-routes
       {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
        (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
@@ -164,6 +166,7 @@
 
 (deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
+    (future (a/>!! code-chan (:code final-state-map)))
     (reset! app-state middle-state-map)
     (with-fake-routes
       {(:token-url final-state-map) (fn [request] (:token-response final-state-map))

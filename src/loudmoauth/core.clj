@@ -11,8 +11,11 @@
 ;TODO - Go over doc strings one more time.
 ;TODO - Uniform keys all over.
 ;TODO - Crap, we need to let the user authenticate. Don't put the get auth code on a future.
+;       Our solution is to put the requesting function on a channel and pull that channel for the browser to access.
 
 (def code-chan (a/chan))
+
+(def interaction-chan (a/chan))
 
 (def app-state (atom {}))
 
@@ -26,10 +29,10 @@
   [params]
   (if-not params
     nil
-  (let [ks (keys params)
-        vs (vals params)
-        new-keys (map #(keyword (str/replace (name %) "-" "_")) ks)]
-    (zipmap new-keys vs))))
+    (let [ks (keys params)
+          vs (vals params)
+          new-keys (map #(keyword (str/replace (name %) "-" "_")) ks)]
+      (zipmap new-keys vs))))
 
 (defn query-param-string 
   "Get query-param string from query parameter map."
@@ -62,10 +65,19 @@
       :code
       (a/>! code-chan))))
 
+;This is the handlers function to retrieve different kinds of dialog pages, nescessary for identification.
+(defn user-interaction
+  "Prompt for user interaction."
+  [request]
+  (a/go
+    (if-let [interaction (a/poll! interaction-chan)]
+      interaction 
+      "No user interaction nescessary.")))
+
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."
   [astate]
-  (client/get (:auth-url astate))
+  (a/go (a/>! interaction-chan (client/get (:auth-url astate))))
   (assoc astate :code (a/<!! code-chan)))
 
 (defn string-to-base64-string
@@ -168,24 +180,24 @@
   "Init ouath token request cycle."
   []
   (let [ old-app-state @app-state] 
-  (->>
-    old-app-state
-    (request-access-to-data)
-    (request-access-and-refresh-tokens)
-    (reset! app-state))))
+    (->>
+      old-app-state
+      (request-access-to-data)
+      (request-access-and-refresh-tokens)
+      (reset! app-state))))
 
 (defn set-oauth-params
   "Set oauth-parameters for use in call to get token"
   [params]
   (let [old-app-state @app-state]
-  (->>
-    (if-not (:response-type params)
-      (add-response-type "code" params)
-      params)
-    (add-state) 
-    (merge old-app-state)
-    (add-encoded-auth-string)
-    (reset! app-state))))
+    (->>
+      (if-not (:response-type params)
+        (add-response-type "code" params)
+        params)
+      (add-state) 
+      (merge old-app-state)
+      (add-encoded-auth-string)
+      (reset! app-state))))
 
 (defn oauth-token
   "Retreive oauth token for use in authentication call"
