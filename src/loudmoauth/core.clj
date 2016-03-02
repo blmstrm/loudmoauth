@@ -65,21 +65,20 @@
       :code
       (a/>! code-chan))))
 
-;This is the handlers function to retrieve different kinds of dialog pages, nescessary for identification.
-(defn user-interaction
-  "Prompt for user interaction."
-  [request]
-  (a/go
-    (if-let [interaction (a/poll! interaction-chan)]
-      interaction 
-      "No user interaction nescessary.")))
-
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."
   [astate]
   (a/go (a/>! interaction-chan (client/get (:auth-url astate))))
   (assoc astate :code (a/<!! code-chan)))
 
+;This is the handlers function to retrieve different kinds of dialog pages, nescessary for identification.
+(defn user-interaction
+  "Prompt for user interaction."
+  [request]
+    (if-let [interaction (a/poll! interaction-chan)]
+      interaction 
+      "No user interaction nescessary."))
+ 
 (defn string-to-base64-string
   "b64 encode string"
   [original]

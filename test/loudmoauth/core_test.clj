@@ -91,6 +91,13 @@
       {(:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
       (is (= final-state-map (fetch-code final-state-map))))))
 
+(deftest test-user-interaction
+  (testing "Pull response from http-requests for authorization and deliver to browser.
+           In the first test we have something on the channel, in the second one the channel is empty."
+    (future (a/>!! interaction-chan (:token-response final-state-map)))
+    (is (= (:token-response final-state-map) (user-interaction {:status 200}))) 
+    (is (= "No user interaction nescessary." (user-interaction {:status 200})))))
+
 (deftest test-string-to-base64-string
   (testing "Conversion from normal string to base64 encoded string."
     (is (= (string-to-base64-string "I'm glad I wore these pants.")))))
