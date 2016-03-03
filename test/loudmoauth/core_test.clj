@@ -4,6 +4,7 @@
             [clojure.core.async :as a]
             [clj-http.fake :refer :all]))
 
+
 (def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09") 
 
 (def test-custom-param-query-param-string  "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09&show_dialog=true") 
@@ -34,7 +35,7 @@
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"})
 
- (def middle-state-map 
+(def middle-state-map 
   {:base-url "https://www.example.com"
    :client-id "5fe01282e44241328a84e7c5cc169165"
    :response-type "code"
@@ -65,6 +66,19 @@
    :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string) 
    }) 
 
+(defn general-fixture
+  "Needed for all tests."
+  [f]
+  (reset! app-state {})
+  (a/>!! code-chan (:code final-state-map)) 
+  (a/>!! interaction-chan (:token-response final-state-map))
+  (with-fake-routes
+    {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
+     (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
+    (f)))
+
+(use-fixtures :each general-fixture)
+ 
 (deftest test-generate-query-param-string
   (testing "Testing generation of query param string with and without :other key"
     (is (= (query-param-string final-state-map) test-custom-param-query-param-string))
@@ -86,15 +100,11 @@
 
 (deftest test-fetch-code
   (testing "Test issuing http get for auth-code from oauth provider."
-    (future (a/>!! code-chan (:code final-state-map)))
-    (with-fake-routes
-      {(:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-      (is (= final-state-map (fetch-code final-state-map))))))
+      (is (= final-state-map (fetch-code final-state-map)))))
 
 (deftest test-user-interaction
   (testing "Pull response from http-requests for authorization and deliver to browser.
            In the first test we have something on the channel, in the second one the channel is empty."
-    (future (a/>!! interaction-chan (:token-response final-state-map)))
     (is (= (:token-response final-state-map) (user-interaction {:status 200}))) 
     (is (= "No user interaction nescessary." (user-interaction {:status 200})))))
 
@@ -136,9 +146,7 @@
 
 (deftest test-get-tokens
   (testing "Test retrieving tokens through http requests."
-    (with-fake-routes
-      {(:token-url final-state-map) (fn [request] (:token-response final-state-map))}
-      (is (= final-state-map (update-in (get-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0)))))))
+    (is (= final-state-map (update-in (get-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0))))))
 
 (deftest test-token-url
   (testing "Create token-url."
@@ -158,27 +166,16 @@
 
 (deftest test-request-access-and-refresh-tokens
   (testing "Build url and retrieve tokens."
-     (with-fake-routes
-      {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-      (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-      (is (= final-state-map (update-in (request-access-and-refresh-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0)))) )))
+      (is (= final-state-map (update-in (request-access-and-refresh-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0))))))
 
 (deftest test-request-access-to-data
   (testing "Build auth url and fetch code."
-    (future (a/>!! code-chan (:code final-state-map)))
-    (with-fake-routes
-      {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-       (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-      (is (= final-state-map) (update-in  (request-access-to-data (dissoc final-state-map :code)) [:token-response :request-time] (fn [x] 0))))))
+       (is (= final-state-map) (update-in  (request-access-to-data (dissoc final-state-map :code)) [:token-response :request-time] (fn [x] 0)))))
 
 (deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
-    (future (a/>!! code-chan (:code final-state-map)))
     (reset! app-state middle-state-map)
-    (with-fake-routes
-      {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-       (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-      (is (= final-state-map (update-in (init) [:token-response :request-time] (fn [x] 0)))))))
+      (is (= final-state-map (update-in (init) [:token-response :request-time] (fn [x] 0))))))
 
 (deftest test-set-oauth-params
   (testing "Test setting oauth-params."
