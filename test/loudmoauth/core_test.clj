@@ -111,16 +111,11 @@
     (parse-code test-code-http-response)
     (is (= (:code final-state-map) (a/<!! code-chan)))))
 
-;This throws an exception that no one catches, but what can we do?
-;TODO - Don't use with-fake-routes here, hard code the http/get method and go with redefs instead.
 (deftest test-fetch-code
   (testing "Test issuing http get for auth-code from oauth provider."
-    (reset-channels)
+   (reset-channels)
    (a/go (a/>!! code-chan (:code final-state-map)))
-   (Thread/sleep 1000)
-    (with-fake-routes
-      {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-       (:auth-url final-state-map) (fn [request] nil)}
+   (with-redefs [clj-http.client/get (constantly (:token-response final-state-map))]
       (is (= final-state-map (fetch-code final-state-map))))))
 
 (deftest test-user-interaction
@@ -170,10 +165,7 @@
 
 (deftest test-get-tokens
   (testing "Test retrieving tokens through http requests."
-    (with-fake-routes
-      {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-       (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-
+       (with-redefs [clj-http.client/post (constantly (:token-response final-state-map))]
       (is (= final-state-map (update-in (get-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0)))))))
 
 (deftest test-token-url
@@ -194,30 +186,22 @@
 
 (deftest test-request-access-and-refresh-tokens
   (testing "Build url and retrieve tokens."
-    (with-fake-routes
-      {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-       (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-      (is (= final-state-map (update-in (request-access-and-refresh-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0)))))))
+       ( with-redefs [clj-http.client/post (constantly (:token-response final-state-map))]
+     (is (= final-state-map (update-in (request-access-and-refresh-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0)))))))
 
   (deftest test-request-access-to-data
     (testing "Build auth url and fetch code."
     (reset-channels)
     (a/go (a/>!! code-chan (:code final-state-map)))
-    (Thread/sleep 1000)
-      (with-fake-routes
-        {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-         (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-        (is (= final-state-map) (update-in  (request-access-to-data (dissoc final-state-map :code)) [:token-response :request-time] (fn [x] 0)))))) 
+        (with-redefs [clj-http.client/get (constantly (:token-response final-state-map))]
+       (is (= final-state-map) (update-in  (request-access-to-data (dissoc final-state-map :code)) [:token-response :request-time] (fn [x] 0)))))) 
 
 (deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
     (reset! app-state middle-state-map)
     (reset-channels)
     (a/go (a/>!! code-chan (:code final-state-map)))
-    (Thread/sleep 1000)
-     (with-fake-routes
-      {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-       (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
+    (with-redefs [clj-http.client/get (constantly (:token-response final-state-map)) clj-http.client/post  (constantly (:token-response final-state-map))]
       (is (= final-state-map (update-in (init) [:token-response :request-time] (fn [x] 0)))))))
 
 (deftest test-set-oauth-params
