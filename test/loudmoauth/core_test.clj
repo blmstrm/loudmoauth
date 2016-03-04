@@ -69,7 +69,7 @@
 (defn drain!
   [ch]
   (a/go-loop []
-           (if (some? (a/poll! ch))
+           (when (a/poll! ch)
              (recur))))
 
 (defn reset-channels
@@ -111,25 +111,25 @@
     (parse-code test-code-http-response)
     (is (= (:code final-state-map) (a/<!! code-chan)))))
 
-;Hangs forever
-(comment
+;This throws an exception that no one catches, but what can we do?
 (deftest test-fetch-code
   (testing "Test issuing http get for auth-code from oauth provider."
     (reset-channels)
+   (a/go (a/>!! code-chan (:code final-state-map)))
+   (Thread/sleep 1000)
     (with-fake-routes
       {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
-       (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-      (is (= final-state-map (fetch-code final-state-map)))))))
+       (:auth-url final-state-map) (fn [request] nil)}
+      (is (= final-state-map (fetch-code final-state-map))))))
 
-;Hangs forever.
-(comment
 (deftest test-user-interaction
   (testing "Pull response from http-requests for authorization and deliver to browser.
            In the first test we have something on the channel, in the second one the channel is empty."
-    (a/poll! interaction-chan)
-    (a/>!! interaction-chan (:token-response final-state-map))
+    (reset-channels)
+    (a/go (a/>!! interaction-chan (:token-response final-state-map)))
+    (Thread/sleep 1000)
     (is (= (:token-response final-state-map) (user-interaction {:status 200}))) 
-    (is (= "No user interaction nescessary." (user-interaction {:status 200}))))))
+    (is (= "No user interaction nescessary." (user-interaction {:status 200})))))
 
 (deftest test-string-to-base64-string
   (testing "Conversion from normal string to base64 encoded string."
@@ -198,21 +198,26 @@
        (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
       (is (= final-state-map (update-in (request-access-and-refresh-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0)))))))
 
-(comment
   (deftest test-request-access-to-data
     (testing "Build auth url and fetch code."
+    (reset-channels)
+    (a/go (a/>!! code-chan (:code final-state-map)))
+    (Thread/sleep 1000)
       (with-fake-routes
         {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
          (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-        (is (= final-state-map) (update-in  (request-access-to-data (dissoc final-state-map :code)) [:token-response :request-time] (fn [x] 0))))))) 
+        (is (= final-state-map) (update-in  (request-access-to-data (dissoc final-state-map :code)) [:token-response :request-time] (fn [x] 0)))))) 
 
-(comment (deftest test-init
+(deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
     (reset! app-state middle-state-map)
-    (with-fake-routes
+    (reset-channels)
+    (a/go (a/>!! code-chan (:code final-state-map)))
+    (Thread/sleep 1000)
+     (with-fake-routes
       {(:token-url final-state-map) (fn [request] (:token-response final-state-map))
        (:auth-url final-state-map) (fn [request] (parse-code test-code-http-response))}
-      (is (= final-state-map (update-in (init) [:token-response :request-time] (fn [x] 0))))))))
+      (is (= final-state-map (update-in (init) [:token-response :request-time] (fn [x] 0)))))))
 
 (deftest test-set-oauth-params
   (testing "Test setting oauth-params."
