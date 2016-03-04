@@ -112,6 +112,7 @@
     (is (= (:code final-state-map) (a/<!! code-chan)))))
 
 ;This throws an exception that no one catches, but what can we do?
+;TODO - Don't use with-fake-routes here, hard code the http/get method and go with redefs instead.
 (deftest test-fetch-code
   (testing "Test issuing http get for auth-code from oauth provider."
     (reset-channels)
