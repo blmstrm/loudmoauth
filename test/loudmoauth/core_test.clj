@@ -78,12 +78,6 @@
   (drain! code-chan)
   (drain! interaction-chan))
 
-(defn put-values-on-channels
-  []
-  "Put a value on each channel."
-     (a/>!! code-chan (:code final-state-map)) 
-     )
-
 (defn reset
   "Reset the state of our app."
   [f]
@@ -114,7 +108,7 @@
 (deftest test-fetch-code
   (testing "Test issuing http get for auth-code from oauth provider."
    (reset-channels)
-   (a/go (a/>!! code-chan (:code final-state-map)))
+   (a/go (a/>! code-chan (:code final-state-map)))
    (with-redefs [clj-http.client/get (constantly (:token-response final-state-map))]
       (is (= final-state-map (fetch-code final-state-map))))))
 
@@ -122,7 +116,7 @@
   (testing "Pull response from http-requests for authorization and deliver to browser.
            In the first test we have something on the channel, in the second one the channel is empty."
     (reset-channels)
-    (a/go (a/>!! interaction-chan (:token-response final-state-map)))
+    (a/go (a/>! interaction-chan (:token-response final-state-map)))
     (Thread/sleep 1000)
     (is (= (:token-response final-state-map) (user-interaction {:status 200}))) 
     (is (= "No user interaction nescessary." (user-interaction {:status 200})))))
@@ -192,7 +186,7 @@
   (deftest test-request-access-to-data
     (testing "Build auth url and fetch code."
     (reset-channels)
-    (a/go (a/>!! code-chan (:code final-state-map)))
+    (a/go (a/>! code-chan (:code final-state-map)))
         (with-redefs [clj-http.client/get (constantly (:token-response final-state-map))]
        (is (= final-state-map) (update-in  (request-access-to-data (dissoc final-state-map :code)) [:token-response :request-time] (fn [x] 0)))))) 
 
@@ -200,7 +194,7 @@
   (testing "Test init function setting parameters and retrieving code and tokens."
     (reset! app-state middle-state-map)
     (reset-channels)
-    (a/go (a/>!! code-chan (:code final-state-map)))
+    (a/go (a/>! code-chan (:code final-state-map)))
     (with-redefs [clj-http.client/get (constantly (:token-response final-state-map)) clj-http.client/post  (constantly (:token-response final-state-map))]
       (is (= final-state-map (update-in (init) [:token-response :request-time] (fn [x] 0)))))))
 
