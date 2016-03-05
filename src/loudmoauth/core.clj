@@ -58,27 +58,28 @@
 (defn parse-code
   "Parse code from http-response and deliver promise."
   [response]
+  (println "Trying to parse code.")
   (a/go
     (->>
-      response
+      response 
       :params
-      :code
+      :code 
       (a/>! code-chan))))
 
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."
   [astate]
-  (a/go (a/>! interaction-chan (client/get (:auth-url astate))))
+  (a/go (a/>! interaction-chan (:auth-url astate)))
   (assoc astate :code (a/<!! code-chan)))
 
 ;This is the handlers function to retrieve different kinds of dialog pages, nescessary for identification.
 (defn user-interaction
   "Prompt for user interaction."
   [request]
-    (if-let [interaction (a/poll! interaction-chan)]
-      interaction 
-      "No user interaction nescessary."))
- 
+  (if-let [interaction-url (a/poll! interaction-chan)]
+    interaction-url
+    "No user interaction nescessary."))
+
 (defn string-to-base64-string
   "b64 encode string"
   [original]
@@ -94,7 +95,7 @@
   [astate]
   (assoc astate :encoded-auth-string (encoded-auth-string astate)))
 
-(defn create-body-params
+(defn create-form-params
   "Create query-params map to include in http body."
   [astate]
   {:grant_type "authorization_code" 
@@ -114,6 +115,7 @@
 (defn parse-tokens
   "Parse access token and refresh-token from http response."
   [astate]
+  (println "Trying to parse tokens.")
   (->>
     (:token-response astate)
     :body 
@@ -128,12 +130,13 @@
 (defn create-query-data
   "Creates quert data for use in http post call when retreiving tokens."
   [astate]
-  {:body (create-body-params astate)
+  {:form-params (create-form-params astate)
    :headers (create-headers astate)})
 
 (defn get-tokens
   "Fetch tokens using crafted url" 
   [astate]
+  (println "Fetching tokens with post from custom url.")
   (->>
     (client/post (:token-url astate) (create-query-data astate)) 
     (assoc astate :token-response)
@@ -162,6 +165,7 @@
 (defn request-access-and-refresh-tokens
   "Request tokens."
   [state-map]
+  (println "Starting in request-access-and-refresh-tokens.")
   (->
     state-map
     (build-token-url) 

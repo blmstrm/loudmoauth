@@ -11,7 +11,7 @@
 
 (def test-encoded-string "SSdtIGdsYWQgSSB3b3JlIHRoZXNlIHBhbnRzLg==")
 
-(def test-body-params {:grant_type "authorization_code"
+(def test-form-params {:grant_type "authorization_code"
                        :code "abcdefghijklmn123456789"
                        :redirect_uri "https://www.example.com/callback"})
 
@@ -23,7 +23,7 @@
 
 (def test-headers {:Authorization test-enc-auth-string})
 
-(def test-query-data {:body test-body-params :headers test-headers})
+(def test-query-data {:form-params test-form-params :headers test-headers})
 
 (def test-code-http-response {:status 200 :headers {} :body {} :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil :params {:state "34fFs29kd09" :code "abcdefghijklmn123456789"}})
 
@@ -133,9 +133,9 @@
   (testing "Adding encoded auth string to state map"
     (is (= (add-encoded-auth-string (dissoc final-state-map :encoded-auth-string)) final-state-map))))
 
-(deftest test-create-body-params
+(deftest test-create-form-params
   (testing "Creation of query parameter map to include in http body."
-    (is (= test-body-params (create-body-params final-state-map)))))
+    (is (= test-form-params (create-form-params final-state-map)))))
 
 (deftest test-add-tokens-to-state-map
   (testing "Add tokens to state map."
