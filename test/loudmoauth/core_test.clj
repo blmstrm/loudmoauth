@@ -11,9 +11,13 @@
 
 (def test-encoded-string "SSdtIGdsYWQgSSB3b3JlIHRoZXNlIHBhbnRzLg==")
 
-(def test-form-params {:grant_type "authorization_code"
+(def test-form-params-auth {:grant_type "authorization_code"
                        :code "abcdefghijklmn123456789"
                        :redirect_uri "https://www.example.com/callback"})
+
+(def test-form-params-refresh {:grant_type "refresh_token"
+                       :refresh_token "sdscgrrf343" })
+
 
 (def test-parsed-body {:access_token "a12dkdirnc" :refresh_token "sdscgrrf343" :expires_in 1245})
 
@@ -23,7 +27,9 @@
 
 (def test-headers {:Authorization test-enc-auth-string})
 
-(def test-query-data {:form-params test-form-params :headers test-headers})
+(def test-query-data-auth {:form-params test-form-params-auth :headers test-headers})
+
+(def test-query-data-refresh {:form-params test-form-params-refresh :headers test-headers})
 
 (def test-code-http-response {:status 200 :headers {} :body {} :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil :params {:state "34fFs29kd09" :code "abcdefghijklmn123456789"}})
 
@@ -44,7 +50,8 @@
    :state "34fFs29kd09"
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
-   :encoded-auth-string test-enc-auth-string 
+   :encoded-auth-string test-enc-auth-string
+   :code "abcdefghijklmn123456789"
    })
 
 (def final-state-map
@@ -117,7 +124,7 @@
            In the first test we have something on the channel, in the second one the channel is empty."
     (reset-channels)
     (a/go (a/>! interaction-chan (:token-response final-state-map)))
-    (Thread/sleep 1000)
+    (Thread/sleep 2000)
     (is (= (:token-response final-state-map) (user-interaction {:status 200}))) 
     (is (= "No user interaction nescessary." (user-interaction {:status 200})))))
 
@@ -135,7 +142,8 @@
 
 (deftest test-create-form-params
   (testing "Creation of query parameter map to include in http body."
-    (is (= test-form-params (create-form-params final-state-map)))))
+    (is (= test-form-params-refresh (create-form-params final-state-map)))
+    (is (= test-form-params-auth (create-form-params middle-state-map)))))  
 
 (deftest test-add-tokens-to-state-map
   (testing "Add tokens to state map."
@@ -155,12 +163,13 @@
 
 (deftest test-create-query-data 
   (testing "Create query data to use in http post request for tokens."
-    (is (= test-query-data (create-query-data final-state-map)))))
+    (is (= test-query-data-auth (create-query-data middle-state-map)))
+    (is (= test-query-data-refresh (create-query-data final-state-map)))))
 
 (deftest test-get-tokens
   (testing "Test retrieving tokens through http requests."
        (with-redefs [clj-http.client/post (constantly (:token-response final-state-map))]
-      (is (= final-state-map (update-in (get-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0)))))))
+      (is (= final-state-map (dissoc  (get-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) :token-refresher))))))
 
 (deftest test-token-url
   (testing "Create token-url."
@@ -181,14 +190,14 @@
 (deftest test-request-access-and-refresh-tokens
   (testing "Build url and retrieve tokens."
        ( with-redefs [clj-http.client/post (constantly (:token-response final-state-map))]
-     (is (= final-state-map (update-in (request-access-and-refresh-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) [:token-response :request-time] (fn [x] 0)))))))
+     (is (= final-state-map (dissoc (request-access-and-refresh-tokens (dissoc final-state-map [:access_token :refresh_token :expires_in])) :token-refresher))))))
 
   (deftest test-request-access-to-data
     (testing "Build auth url and fetch code."
     (reset-channels)
     (a/go (a/>! code-chan (:code final-state-map)))
         (with-redefs [clj-http.client/get (constantly (:token-response final-state-map))]
-       (is (= final-state-map) (update-in  (request-access-to-data (dissoc final-state-map :code)) [:token-response :request-time] (fn [x] 0)))))) 
+       (is (= final-state-map) (request-access-to-data (dissoc final-state-map :code)))))) 
 
 (deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
@@ -196,13 +205,12 @@
     (reset-channels)
     (a/go (a/>! code-chan (:code final-state-map)))
     (with-redefs [clj-http.client/get (constantly (:token-response final-state-map)) clj-http.client/post  (constantly (:token-response final-state-map))]
-      (is (= final-state-map (update-in (init) [:token-response :request-time] (fn [x] 0)))))))
+      (is (= final-state-map (dissoc (init) :token-refresher))))))
 
 (deftest test-set-oauth-params
   (testing "Test setting oauth-params."
-    (reset! app-state {})
     (with-redefs [uuid (fn [] "34fFs29kd09")]
-      (is (= middle-state-map (set-oauth-params start-state-map))))))
+      (is (= (dissoc middle-state-map :code) (set-oauth-params start-state-map))))))
 
 (deftest test-oauth-token
   (testing "Retrieve oauth-token from state-map."

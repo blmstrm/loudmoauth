@@ -11,7 +11,9 @@
 ;TODO - Go over doc strings one more time.
 ;TODO - Uniform keys all over.
 ;TODO - Crap, we need to let the user authenticate. Don't put the get auth code on a future.
-;       Our solution is to put the requesting function on a channel and pull that channel for the browser to access.
+;       Our solution is to put the code url on a channel and let user redirect to that channel in his/her implementation, or what ever they like to do to make the process proced.
+
+(declare get-tokens)
 
 (def code-chan (a/chan))
 
@@ -98,9 +100,12 @@
 (defn create-form-params
   "Create query-params map to include in http body."
   [astate]
+  (if-not (:refresh_token astate)
   {:grant_type "authorization_code" 
    :code (:code astate)
-   :redirect_uri (:redirect-uri astate)})
+   :redirect_uri (:redirect-uri astate)}
+  {:grant_type "refresh_token"
+   :refresh_token (:refresh_token astate)}))
 
 (defn add-tokens-to-state-map
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
@@ -133,6 +138,22 @@
   {:form-params (create-form-params astate)
    :headers (create-headers astate)})
 
+(defn token-refresher
+  "Starts a call to get-tokens in s seconds, continues forever until cancelled."
+  [s]
+  (future (while true (do (Thread/sleep s) (get-tokens @app-state)))))
+ 
+(defn launch-token-refresher
+  "Start a timed event to try to refresh oauth-tokens sometime in the future."
+  [astate]
+  (when-let [token-refresher (:token-refresher astate)]
+    (future-cancel token-refresher))
+  (when-let [expiry-time (:expires_in astate)]
+    (assoc astate :token-refresher (token-refresher expiry-time))))
+
+;TODO If oauth-token is not set, do the initial call. If it is already set do a refresh call.
+; By doing it this way we don't have to distinguish between grant_type outside get-tokens.
+; We will make sure to supply a emergency refresh-token function call.
 (defn get-tokens
   "Fetch tokens using crafted url" 
   [astate]
@@ -140,7 +161,8 @@
   (->>
     (client/post (:token-url astate) (create-query-data astate)) 
     (assoc astate :token-response)
-    (parse-tokens)))
+    (parse-tokens)
+    (launch-token-refresher)))
 
 (defn token-url
   "Build the url for retreieving tokens."
@@ -166,7 +188,7 @@
   "Request tokens."
   [state-map]
   (println "Starting in request-access-and-refresh-tokens.")
-  (->
+  (->>
     state-map
     (build-token-url) 
     (get-tokens)))
