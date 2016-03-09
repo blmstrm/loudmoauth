@@ -41,7 +41,7 @@
 (defn add-state
   "Adds unique state-id to state map astate."
   [astate]
-  (assoc astate :state (uuid)))
+  (assoc astate :state (lmutil/uuid)))
 
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."

@@ -1,5 +1,10 @@
-(ns loudmoauth.test-data
-  (:require [clojure.core.async :as a]))
+(ns loudmoauth.test-fixtures
+  (:require [clojure.core.async :as a]
+            [loudmoauth.authflow :as lma]))
+
+
+
+
 
 (def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09") 
 
@@ -50,8 +55,7 @@
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
    :encoded-auth-string test-enc-auth-string
-   :code "abcdefghijklmn123456789"
-   })
+   :code "abcdefghijklmn123456789"})
 
 (def final-state-map
   {:base-url "https://www.example.com"
@@ -69,9 +73,15 @@
    :refresh_token "sdscgrrf343"
    :expires_in 1245 
    :token-url "https://www.example.com/api/token" 
-   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string) 
-   }) 
+   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)}) 
 
+(defn reset
+  "Reset the state a of our app before calling test f."
+  [f]
+  (reset! lma/app-state {})
+  (f))
+
+ 
 (defn drain!
   [ch]
   (a/go-loop []
@@ -79,14 +89,9 @@
              (recur))))
 
 (defn reset-channels
-  [cs]
+  []
   "Reset our interaction and code channels to be able to start fresh."
-  (drain! code-chan)
-  (drain! interaction-chan))
+  (drain! lma/code-chan)
+  (drain! lma/interaction-chan))
 
-(defn reset
-  "Reset the state of our app."
-  [f]
-  (reset! app-state {})
-  (f))
- 
+

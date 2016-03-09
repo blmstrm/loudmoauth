@@ -1,6 +1,7 @@
 (ns loudmoauth.util
  (:require [clojure.data.codec.base64 :as b64]
-            [clojure.data.json :as json]))
+            [clojure.data.json :as json]
+            [clojure.string :as str]))
 
 (defn uuid [] (str (java.util.UUID/randomUUID)))
 
