@@ -19,8 +19,8 @@
     (tf/reset-channels)
     (a/go (a/>! lma/interaction-chan (:auth-url tf/final-state-map)))
     (Thread/sleep 2000)
-    (is (= (:auth-url tf/final-state-map) (user-interaction {:status 200}))) 
-    (is (= "No user interaction nescessary." (user-interaction {:status 200})))))
+    (is (= (:auth-url tf/final-state-map) (user-interaction))) 
+    (is (= "No user interaction nescessary." (user-interaction)))))
  
 (deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
