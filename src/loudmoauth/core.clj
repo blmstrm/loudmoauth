@@ -4,7 +4,8 @@
 
 ;We need to identify what provider we are coming from here? 
 ;Together with the code do we get our state? That's our key so that's good.
-;But how do we map a key to another key provided by our users.
+;We do get our state here. If state isn't present, what else can we use?
+;But how do we map a key to another key provided by our users. We need a map where we map user defined keys to our state ids.
 (defn parse-code
   "Parse code from http-response and deliver promise."
   [response]
