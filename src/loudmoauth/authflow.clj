@@ -2,6 +2,7 @@
   (:require [loudmoauth.util :as lmutil]
             [clojure.string :as str]
             [clojure.core.async :as a]
+            [clojure.algo.generic.functor :as functor]
             [clj-http.client :as client]))
 
 (def code-chan (a/chan))
@@ -146,3 +147,23 @@
     (build-auth-url)
     (fetch-code)))
 
+(defn init-provider
+  [provider-auth-data]
+  (->>
+    provider-auth-data
+    (request-access-to-data)
+    (request-access-and-refresh-tokens)))  
+
+(defn init-one
+  "Init one provider based on provider name."
+  [provider]
+  (->>
+  (init-provider (provider @app-state))
+  (swap! app-state merge)))
+
+(defn init-all
+  "Init all providers stored in app."
+  [] 
+  (->>
+    (functor/fmap init-provider @app-state)
+    (swap! app-state merge)))

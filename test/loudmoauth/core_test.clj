@@ -24,19 +24,19 @@
  
 (deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
-    (reset! lma/app-state tf/middle-state-map)
+    (reset! lma/app-state tf/several-providers-middle-state-map)
     (tf/reset-channels)
     (a/go (a/>! lma/code-chan (:code tf/final-state-map)))
     (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
-      (is (= tf/final-state-map (dissoc (init) :token-refresher))))))
+      (is (= tf/several-providers-final-state-map (dissoc (init) :token-refresher))))))
 
 (deftest test-set-oauth-params
   (testing "Test setting oauth-params."
     (with-redefs [lmutil/uuid (fn [] "34fFs29kd09")]
-      (is (= (dissoc tf/middle-state-map :code) (set-oauth-params tf/start-state-map))))))
+      (is (= (dissoc tf/several-providers-middle-state-map :code) (set-oauth-params tf/start-state-map))))))
 
 (deftest test-oauth-token
   (testing "Retrieve oauth-token from state-map."
-    (reset! lma/app-state tf/final-state-map)
-    (is (= (:access_token tf/final-state-map) (oauth-token)))))
+    (reset! lma/app-state tf/several-providers-final-state-map)
+    (is (= (:access_token tf/final-state-map) (oauth-token :example)))))
 

@@ -18,23 +18,18 @@
 
 ;Here we pass the name of our provider, :spotify or "spotify" or whatever
 (defn refresh-token
-  ([] (lma/get-tokens (first @lma/app-state)))
   "In case of emergency token refresh, we supply this function."
-  ([provider] ( lma/get-tokens (provider @lma/app-state))))
+  ([] (lma/get-tokens (first @lma/app-state)))
+  ([provider] (lma/get-tokens (provider @lma/app-state))))
 
 ;Should we just init everything at once.
+;If not args passed map init functions over every key in app. If provider name specified init only that provider.
 (defn init
   "Init oauth token request cycle."
-  []
-  (let [old-app-state @lma/app-state] 
-    (->>
-      old-app-state
-      (lma/request-access-to-data)
-      (lma/request-access-and-refresh-tokens)
-      (reset! lma/app-state))))
+  ([] (lma/init-all))
+  ([provider] (lma/init-one provider)))
 
 ;This is the handlers function to retrieve different kinds of dialog pages, nescessary for identification.
-;Here we could be creative and add our key in the metadata of the interaction url or just return a map instead with our key and url.
 (defn user-interaction
   "Prompt for user interaction."
   []
@@ -62,5 +57,4 @@
 ;Here we either supply our key or don't. If no key, just return (first tokens)
 (defn oauth-token
   "Retreive oauth token for use in authentication call"
-  ([] (:access_token (first @lma/app-state)))
-  ([provider] (provider @lma/app-state)))
+  ([provider] (:access_token (provider @lma/app-state))))
