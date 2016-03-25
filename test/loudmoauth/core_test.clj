@@ -21,7 +21,7 @@
     (Thread/sleep 2000)
     (is (= (:auth-url tf/final-state-map) (user-interaction))) 
     (is (= nil (user-interaction)))))
- 
+
 (deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
     (reset! lma/app-state tf/several-providers-middle-state-map)

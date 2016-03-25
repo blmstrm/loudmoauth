@@ -154,12 +154,13 @@
     (request-access-to-data)
     (request-access-and-refresh-tokens)))  
 
+;TODO  - How do we merge back in here?
 (defn init-one
   "Init one provider based on provider name."
   [provider]
   (->>
   (init-provider (provider @app-state))
-  (swap! app-state merge)))
+  (swap! app-state update-in [provider] @app-state)))
 
 (defn init-all
   "Init all providers stored in app."
