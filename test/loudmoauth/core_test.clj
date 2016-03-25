@@ -20,7 +20,7 @@
     (a/go (a/>! lma/interaction-chan (:auth-url tf/final-state-map)))
     (Thread/sleep 2000)
     (is (= (:auth-url tf/final-state-map) (user-interaction))) 
-    (is (= "No user interaction nescessary." (user-interaction)))))
+    (is (= nil (user-interaction)))))
  
 (deftest test-init
   (testing "Test init function setting parameters and retrieving code and tokens."
@@ -28,12 +28,12 @@
     (tf/reset-channels)
     (a/go (a/>! lma/code-chan (:code tf/final-state-map)))
     (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
-      (is (= tf/several-providers-final-state-map (dissoc (init) :token-refresher))))))
+      (is (= tf/several-providers-final-state-map (update-in (init) [:example] dissoc :token-refresher))))))
 
 (deftest test-set-oauth-params
   (testing "Test setting oauth-params."
     (with-redefs [lmutil/uuid (fn [] "34fFs29kd09")]
-      (is (= (dissoc tf/several-providers-middle-state-map :code) (set-oauth-params tf/start-state-map))))))
+      (is (= (update-in tf/several-providers-middle-state-map [:example] dissoc :code) (set-oauth-params tf/start-state-map))))))
 
 (deftest test-oauth-token
   (testing "Retrieve oauth-token from state-map."

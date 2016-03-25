@@ -73,8 +73,8 @@
    :refresh_token "sdscgrrf343"
    :expires_in 1245 
    :token-url "https://www.example.com/api/token" 
-   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string
-   :provider :example)}) 
+   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
+   :provider :example}) 
 
 (def several-providers-middle-state-map
   {:example middle-state-map})
