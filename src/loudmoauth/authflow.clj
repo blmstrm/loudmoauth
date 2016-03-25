@@ -154,7 +154,6 @@
     (request-access-to-data)
     (request-access-and-refresh-tokens)))  
 
-;TODO  - How do we merge back in here?
 (defn init-one
   "Init one provider based on provider name."
   [provider]
