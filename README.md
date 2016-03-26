@@ -2,7 +2,8 @@
 [![Clojars](https://img.shields.io/clojars/v/loudmoauth.svg)](http://clojars.org/loudmoauth)
 [![Coverage Status](https://coveralls.io/repos/github/blmstrm/loudmoauth/badge.svg?branch=master)](https://coveralls.io/github/blmstrm/loudmoauth?branch=master)
 [![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
-# Loudmoauth Loudmoauth is a general ouath2 client library. 
+#Loudmoauth
+Loudmoauth is a general ouath2 client library. 
 
 ##Quickstart
 To use `loudmoauth` with Leiningen or Boot include `[loudmoauth.core "0.1.0"]`.
