@@ -53,7 +53,6 @@
         params)
       (lma/add-state) 
       (merge old-app-state)
-      (lma/add-encoded-auth-string)
       (swap! lma/app-state assoc provider))))
 
 ;Here we either supply our key or don't. If no key, just return (first tokens)

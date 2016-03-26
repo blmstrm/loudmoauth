@@ -15,76 +15,65 @@
 
 (declare get-tokens)
 
-(defn create-headers
-  "Creates headers to for use in http post call."
-  [astate]
-  {:Authorization (:encoded-auth-string astate)})
-
-(defn encoded-auth-string
-  "Create and encode credentials string for use in header."
-  [astate]
-  (str "Basic " (lmutil/string-to-base64-string (str (:client-id astate) ":" (:client-secret astate)))))
-
 (defn query-param-string 
   "Get query-param string from query parameter map."
-  [astate]
+  [provider-auth-data]
   (->>
-    (:custom-query-params astate)
-    (merge (select-keys astate query-params))
+    (:custom-query-params provider-auth-data)
+    (merge (select-keys provider-auth-data query-params))
     (lmutil/change-keys)
     (client/generate-query-string)))
 
 (defn add-response-type
-  "Adds response type rtype to state mape astate"
-  [rtype astate]
-  (assoc astate :response-type rtype))
+  "Adds response type rtype to state mape provider-auth-data"
+  [rtype provider-auth-data]
+  (assoc provider-auth-data :response-type rtype))
 
 (defn add-state
-  "Adds unique state-id to state map astate."
-  [astate]
-  (assoc astate :state (lmutil/uuid)))
+  "Adds unique state-id to state map provider-auth-data."
+  [provider-auth-data]
+  (assoc provider-auth-data :state (lmutil/uuid)))
 
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."
-  [astate]
-  (a/go (a/>! interaction-chan (:auth-url astate)))
-  (assoc astate :code (a/<!! code-chan)))
-
-(defn add-encoded-auth-string
-  "Add encoded credential string to state map."
-  [astate]
-  (assoc astate :encoded-auth-string (encoded-auth-string astate)))
+  [provider-auth-data]
+  (a/go (a/>! interaction-chan (:auth-url provider-auth-data)))
+  (assoc provider-auth-data :code (a/<!! code-chan)))
 
 ;TODO - Refactor this one.
 (defn create-form-params
   "Create query-params map to include in http body."
-  [astate]
-  (if-not (:refresh_token astate)
+  [provider-auth-data]
+  (if-not (:refresh_token provider-auth-data)
     {:grant_type "authorization_code" 
-     :code (:code astate)
-     :redirect_uri (:redirect-uri astate)}
+     :code (:code provider-auth-data)
+     :redirect_uri (:redirect-uri provider-auth-data)
+     :client_id (:client-id provider-auth-data)
+     :client_secret (:client-secret provider-auth-data)
+     }
     {:grant_type "refresh_token"
-     :refresh_token (:refresh_token astate)}))
+     :refresh_token (:refresh_token provider-auth-data)
+     :client_id (:client-id provider-auth-data)
+     :client_secret (:client-secret provider-auth-data)}))
 
 (defn add-tokens-to-state-map
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
-  [astate parsed-body]
-  (merge astate (select-keys parsed-body [:access_token :refresh_token :expires_in])))
+  [provider-auth-data parsed-body]
+  (merge provider-auth-data (select-keys parsed-body [:access_token :refresh_token :expires_in])))
 
 (defn parse-tokens
   "Parse access token and refresh-token from http response."
-  [astate]
+  [provider-auth-data]
   (->>
-    (:token-response astate)
+    (:token-response provider-auth-data)
     :body 
     (lmutil/parse-json-from-response-body)
-    (add-tokens-to-state-map astate)))
+    (add-tokens-to-state-map provider-auth-data)))
 
 (defn create-query-data
   "Creates quert data for use in http post call when retreiving tokens."
-  [astate]
-  {:form-params (create-form-params astate)
-   :headers (create-headers astate)})
+  [provider-auth-data]
+  {:form-params (create-form-params provider-auth-data)})
 
 (defn token-refresher
   "Starts a call to get-tokens in s seconds, continues forever until cancelled."
@@ -93,57 +82,57 @@
 
 (defn launch-token-refresher
   "Start a timed event to try to refresh oauth-tokens sometime in the future."
-  [astate]
-  (when-let [token-refresher (:token-refresher astate)]
+  [provider-auth-data]
+  (when-let [token-refresher (:token-refresher provider-auth-data)]
     (future-cancel token-refresher))
-  (when-let [expiry-time (:expires_in astate)]
-    (assoc astate :token-refresher (token-refresher expiry-time))))
+  (when-let [expiry-time (:expires_in provider-auth-data)]
+    (assoc provider-auth-data :token-refresher (token-refresher expiry-time))))
 
 ;TODO If oauth-token is not set, do the initial call. If it is already set do a refresh call.
 ; By doing it this way we don't have to distinguish between grant_type outside get-tokens.
 ; We will make sure to supply a emergency refresh-token function call.
 (defn get-tokens
   "Fetch tokens using crafted url" 
-  [astate]
+  [provider-auth-data]
   (->>
-    (client/post (:token-url astate) (create-query-data astate)) 
-    (assoc astate :token-response)
+    (client/post (:token-url provider-auth-data) (create-query-data provider-auth-data)) 
+    (assoc provider-auth-data :token-response)
     (parse-tokens)
     (launch-token-refresher)))
 
 (defn token-url
   "Build the url for retreieving tokens."
-  [astate]
-  (str (:base-url astate) (:token-endpoint astate)))
+  [provider-auth-data]
+  (str (:base-url provider-auth-data) (:token-endpoint provider-auth-data)))
 
 (defn build-token-url
   "Build token url."
-  [astate]
-  (assoc astate :token-url (token-url astate)))
+  [provider-auth-data]
+  (assoc provider-auth-data :token-url (token-url provider-auth-data)))
 
 (defn auth-url
   "Build the authorization url."
-  [astate]
-  (str (:base-url astate) (:auth-endpoint astate) "/?" (query-param-string astate)))
+  [provider-auth-data]
+  (str (:base-url provider-auth-data) (:auth-endpoint provider-auth-data) "/?" (query-param-string provider-auth-data)))
 
 (defn build-auth-url
   "Build oauth-url."
-  [astate]
-  (assoc astate :auth-url (auth-url astate)))
+  [provider-auth-data]
+  (assoc provider-auth-data :auth-url (auth-url provider-auth-data)))
 
 (defn request-access-and-refresh-tokens
   "Request tokens."
-  [state-map]
+  [provider-auth-data]
   (->>
-    state-map
+    provider-auth-data
     (build-token-url) 
     (get-tokens)))
 
 (defn request-access-to-data
   "Request authorization code."
-  [astate]
+  [provider-auth-data]
   (->
-    astate
+    provider-auth-data
     (build-auth-url)
     (fetch-code)))
 
