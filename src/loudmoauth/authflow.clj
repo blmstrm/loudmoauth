@@ -114,7 +114,7 @@
 (defn token-url
   "Build the url for retreieving tokens."
   [astate]
-  (str (:base-url astate) "/api/token"))
+  (str (:base-url astate) (:token-endpoint astate)))
 
 (defn build-token-url
   "Build token url."
@@ -124,7 +124,7 @@
 (defn auth-url
   "Build the authorization url."
   [astate]
-  (str (:base-url astate) "/authorize/?" (query-param-string astate)))
+  (str (:base-url astate) (:auth-endpoint astate) "/?" (query-param-string astate)))
 
 (defn build-auth-url
   "Build oauth-url."

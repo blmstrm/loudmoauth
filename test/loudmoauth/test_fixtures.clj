@@ -35,6 +35,8 @@
 
 (def start-state-map
   {:base-url "https://www.example.com"
+   :auth-endpoint "/authorize"
+   :token-endpoint "/api/token"
    :client-id "5fe01282e44241328a84e7c5cc169165"
    :redirect-uri "https://www.example.com/callback"
    :scope "user-read-private user-read-email"
@@ -45,6 +47,8 @@
 
 (def middle-state-map 
   {:base-url "https://www.example.com"
+   :auth-endpoint "/authorize"
+   :token-endpoint "/api/token"
    :client-id "5fe01282e44241328a84e7c5cc169165"
    :response-type "code"
    :redirect-uri "https://www.example.com/callback"
@@ -59,6 +63,8 @@
 
 (def final-state-map
   {:base-url "https://www.example.com"
+   :auth-endpoint "/authorize"
+   :token-endpoint "/api/token"
    :client-id "5fe01282e44241328a84e7c5cc169165"
    :response-type "code"
    :redirect-uri "https://www.example.com/callback"
