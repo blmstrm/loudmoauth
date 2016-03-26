@@ -85,8 +85,9 @@
   [provider-auth-data]
   (when-let [token-refresher (:token-refresher provider-auth-data)]
     (future-cancel token-refresher))
-  (when-let [expiry-time (:expires_in provider-auth-data)]
-    (assoc provider-auth-data :token-refresher (token-refresher expiry-time))))
+  (if-let [expiry-time (:expires_in provider-auth-data)]
+    (assoc provider-auth-data :token-refresher (token-refresher expiry-time))
+   provider-auth-data))
 
 ;TODO If oauth-token is not set, do the initial call. If it is already set do a refresh call.
 ; By doing it this way we don't have to distinguish between grant_type outside get-tokens.
