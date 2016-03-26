@@ -30,14 +30,6 @@
    (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map))]
       (is (= tf/final-state-map (fetch-code tf/final-state-map))))))
 
-(deftest test-encoded-auth-string
-  (testing "Base64 encode auth-string."
-    (is (= (:encoded-auth-string tf/final-state-map) (encoded-auth-string (dissoc  tf/final-state-map :encoded-auth-string))))))
-
-(deftest test-add-encoded-auth-string
-  (testing "Adding encoded auth string to state map"
-    (is (= (add-encoded-auth-string (dissoc tf/final-state-map :encoded-auth-string)) tf/final-state-map))))
-
 (deftest test-create-form-params
   (testing "Creation of query parameter map to include in http body."
     (is (= tf/test-form-params-refresh (create-form-params tf/final-state-map)))
@@ -50,10 +42,6 @@
 (deftest test-parse-tokens
   (testing "Parse response body from http response and parse tokens from response body add add to state map."
     (is (= tf/final-state-map (parse-tokens (dissoc tf/final-state-map [:access_token :refresh_token :expires_in]))))))
-
-(deftest test-create-headers
-  (testing "Create http headers to use in post request for tokens."
-    (is (= tf/test-headers (create-headers tf/final-state-map)))))
 
 (deftest test-create-query-data 
   (testing "Create query data to use in http post request for tokens."

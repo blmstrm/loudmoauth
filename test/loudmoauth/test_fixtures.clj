@@ -14,22 +14,22 @@
 
 (def test-form-params-auth {:grant_type "authorization_code"
                        :code "abcdefghijklmn123456789"
-                       :redirect_uri "https://www.example.com/callback"})
+                       :redirect_uri "https://www.example.com/callback"
+                       :client_id "5fe01282e44241328a84e7c5cc169165"
+                       :client_secret "123456789secret"})
 
 (def test-form-params-refresh {:grant_type "refresh_token"
-                       :refresh_token "sdscgrrf343" })
+                       :refresh_token "sdscgrrf343"
+                       :client_id "5fe01282e44241328a84e7c5cc169165"
+                       :client_secret "123456789secret"})
 
 (def test-parsed-body {:access_token "a12dkdirnc" :refresh_token "sdscgrrf343" :expires_in 1245})
 
 (def test-response-body-string "{\"access_token\":\"a12dkdirnc\",\"refresh_token\":\"sdscgrrf343\",\"expires_in\":1245}")
 
-(def test-enc-auth-string "Basic NWZlMDEyODJlNDQyNDEzMjhhODRlN2M1Y2MxNjkxNjU6MTIzNDU2Nzg5c2VjcmV0")
+(def test-query-data-auth {:form-params test-form-params-auth})
 
-(def test-headers {:Authorization test-enc-auth-string})
-
-(def test-query-data-auth {:form-params test-form-params-auth :headers test-headers})
-
-(def test-query-data-refresh {:form-params test-form-params-refresh :headers test-headers})
+(def test-query-data-refresh {:form-params test-form-params-refresh})
 
 (def test-code-http-response {:status 200 :headers {} :body {} :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil :params {:state "34fFs29kd09" :code "abcdefghijklmn123456789"}})
 
@@ -56,7 +56,6 @@
    :state "34fFs29kd09"
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
-   :encoded-auth-string test-enc-auth-string
    :code "abcdefghijklmn123456789"
    :provider :example
    })
@@ -72,7 +71,6 @@
    :state "34fFs29kd09"
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
-   :encoded-auth-string test-enc-auth-string 
    :code "abcdefghijklmn123456789"
    :token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil} 
    :access_token "a12dkdirnc"
