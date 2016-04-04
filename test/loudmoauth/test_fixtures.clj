@@ -101,7 +101,8 @@
 (defn reset-channels
   []
   "Reset our interaction and code channels to be able to start fresh."
-  (drain! lma/code-chan)
+  (drain! lma/params-chan)
+  (drain! lma/state-chan)
   (drain! lma/interaction-chan))
 
 

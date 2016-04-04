@@ -5,9 +5,11 @@
             [clojure.algo.generic.functor :as functor]
             [clj-http.client :as client]))
 
-(def code-chan (a/chan))
+(def params-chan (a/chan))
 
 (def interaction-chan (a/chan))
+
+(def state-chan (a/chan))
 
 (def app-state (atom {}))
 
@@ -34,11 +36,13 @@
   [provider-auth-data]
   (assoc provider-auth-data :state (lmutil/uuid)))
 
+;Wait here for your code, promise?
+;The last line, when :code is populated, Execute!
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."
   [provider-auth-data]
   (a/go (a/>! interaction-chan (:auth-url provider-auth-data)))
-  (assoc provider-auth-data :code (a/<!! code-chan)))
+  (assoc provider-auth-data :code (:code (a/<!! state-chan))))
 
 ;TODO - Refactor this one.
 (defn create-form-params
@@ -49,8 +53,7 @@
      :code (:code provider-auth-data)
      :redirect_uri (:redirect-uri provider-auth-data)
      :client_id (:client-id provider-auth-data)
-     :client_secret (:client-secret provider-auth-data)
-     }
+     :client_secret (:client-secret provider-auth-data)}
     {:grant_type "refresh_token"
      :refresh_token (:refresh_token provider-auth-data)
      :client_id (:client-id provider-auth-data)

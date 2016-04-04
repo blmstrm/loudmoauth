@@ -7,7 +7,7 @@
  
 (use-fixtures :each tf/reset)
 
-(def chans (list code-chan interaction-chan))
+(def chans (list params-chan interaction-chan))
 
 (deftest test-generate-query-param-string
   (testing "Testing generation of query param string with and without :other key"
@@ -26,7 +26,7 @@
 (deftest test-fetch-code
   (testing "Test issuing http get for auth-code from oauth provider."
    (tf/reset-channels)
-   (a/go (a/>! code-chan (:code tf/final-state-map)))
+   (a/go (a/>! params-chan (select-keys tf/final-state-map [:state :code])))
    (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map))]
       (is (= tf/final-state-map (fetch-code tf/final-state-map))))))
 
@@ -77,7 +77,7 @@
   (deftest test-request-access-to-data
     (testing "Build auth url and fetch code."
     (tf/reset-channels)
-    (a/go (a/>! code-chan (:code tf/final-state-map)))
+    (a/go (a/>! params-chan (:code tf/final-state-map)))
         (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map))]
        (is (= tf/final-state-map) (request-access-to-data (dissoc tf/final-state-map :code)))))) 
 
@@ -85,7 +85,7 @@
   (testing "Init a provider given the data."
     (reset! app-state tf/several-providers-middle-state-map)
     (tf/reset-channels)
-    (a/go (a/>! code-chan (:code tf/final-state-map)))
+    (a/go (a/>! params-chan (:code tf/final-state-map)))
     (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
       (is (= tf/final-state-map (dissoc (init-provider tf/middle-state-map) :token-refresher))))))
 
@@ -94,7 +94,7 @@
   (testing "Init a provider given the provider keyword."
     (reset! app-state tf/several-providers-middle-state-map)
     (tf/reset-channels)
-    (a/go (a/>! code-chan (:code tf/final-state-map)))
+    (a/go (a/>! params-chan (:code tf/final-state-map)))
     (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
       (is (= tf/several-providers-final-state-map (update-in  (init-one :example) [:example] dissoc  :token-refresher))))))
 
@@ -102,6 +102,6 @@
   (testing "Init all provider given the provider keyword."
     (reset! app-state tf/several-providers-middle-state-map)
     (tf/reset-channels)
-    (a/go (a/>! code-chan (:code tf/final-state-map)))
+    (a/go (a/>! params-chan (:code tf/final-state-map)))
     (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
       (is (= tf/several-providers-final-state-map (update-in (init-all) [:example] dissoc :token-refresher))))))

@@ -6,34 +6,30 @@
 ;Together with the code do we get our state? That's our key so that's good.
 ;We do get our state here. If state isn't present, what else can we use?
 ;But how do we map a key to another key provided by our users. We need a map where we map user defined keys to our state ids.
-(defn parse-code
-  "Parse code from http-response and deliver promise."
+;Don't use a channel. Just do your mapping and be done.
+(defn parse-params
+  "Parse parameters from http-response and put on channel."
   [response]
   (a/go
     (->>
       response 
       :params
-      :code 
-      (a/>! lma/code-chan))))
+      (a/>! lma/params-chan))))
 
-;Here we pass the name of our provider, :spotify or "spotify" or whatever
-;If no argument refresh all providers tokens.
 (defn refresh-token
-  "In case of emergency token refresh, we supply this function."
+  "In case of emergency token refresh, call this function with provider keyword to update
+  a specific provider, calling it without arguments tries to update all keys."
   ([] (map lma/get-tokens @lma/app-state))
   ([provider] (lma/get-tokens (provider @lma/app-state))))
 
-;Should we just init everything at once.
-;If not args passed map init functions over every key in app. If provider name specified init only that provider.
 (defn init
-  "Init oauth token request cycle."
+  "Initiate oauth token request cycle. If called with no arguments we init all providers.
+  To init one specific provider supply the provider keyword."
   ([] (lma/init-all))
   ([provider] (lma/init-one provider)))
 
-;This is the handlers function to retrieve different kinds of dialog pages, nescessary for identification.
-
 (defn user-interaction
-  "Prompt for user interaction."
+  "Returns user interaction url if present, nil if not."
   []
   (if-let [interaction-url (a/poll! lma/interaction-chan)]
     interaction-url
