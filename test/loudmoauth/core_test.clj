@@ -10,9 +10,8 @@
 
 (deftest test-parse-params
   (testing "Test parsing of :code and :state in incoming request params."
-    (tf/reset-channels)
     (parse-params tf/test-code-http-response)
-    (is (= (:code tf/final-state-map) (:code (a/<!! lma/state-chan))))))
+    (is (= (:code tf/final-state-map) (:code (:sp @lma/app-state))))))
  
 (deftest test-user-interaction
   (testing "Pull the url used for interaction from channel and publish on end point where hopefully browser is waiting. In the first test we have something on the channel, in the second one the channel is empty."

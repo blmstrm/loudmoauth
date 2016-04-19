@@ -1,6 +1,7 @@
 (ns loudmoauth.core
   (:require [clojure.core.async :as a]
-            [loudmoauth.authflow :as lma]))
+            [loudmoauth.authflow :as lma]
+            [loudmoauth.util :as util]))
 
 ;We need to identify what provider we are coming from here? 
 ;Together with the code do we get our state? That's our key so that's good.
@@ -14,13 +15,16 @@
     (->>
       response 
       :params
-      (a/>! lma/params-chan))))
+      (lma/match-code-to-provider))))
 
+;Reverser match on provider name instead of state
 (defn refresh-token
   "In case of emergency token refresh, call this function with provider keyword to update
   a specific provider, calling it without arguments tries to update all keys."
   ([] (map lma/get-tokens @lma/app-state))
-  ([provider] (lma/get-tokens (provider @lma/app-state))))
+  ([provider]
+   (let [provider-data util/provider-reverse-lookup provider @lma/app-state]
+     (lma/get-tokens provider-data))))
 
 (defn init
   "Initiate oauth token request cycle. If called with no arguments we init all providers.
@@ -40,17 +44,18 @@
 (defn set-oauth-params
   "Set oauth-parameters for use in call to get token"
   [params]
-  (let [old-app-state @lma/app-state
-        provider (:provider params)
-        ]
+  (let [old-app-state @lma/app-state ]
     (->>
       (if-not (:response-type params)
         (lma/add-response-type "code" params)
         params)
       (lma/add-state) 
-      (swap! lma/app-state assoc provider))))
+      #(swap! lma/app-state assoc (:state %) %))))
 
+;Reverser match on provider name instead of state
 ;Here we either supply our key or don't. If no key, just return (first tokens)
 (defn oauth-token
   "Retreive oauth token for use in authentication call"
-  ([provider] (:access_token (provider @lma/app-state))))
+  ([provider]
+   (let [provider-data (util/provider-reverse-lookup provider @lma/app-state)]
+     (:access_token provider-data))))

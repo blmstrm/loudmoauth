@@ -3,9 +3,6 @@
             [loudmoauth.authflow :as lma]))
 
 
-
-
-
 (def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09") 
 
 (def test-custom-param-query-param-string  "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09&show_dialog=true") 
@@ -14,8 +11,7 @@
 
 (def test-form-params-auth {:grant_type "authorization_code"
                        :code "abcdefghijklmn123456789"
-                       :redirect_uri "https://www.example.com/callback"
-                       :client_id "5fe01282e44241328a84e7c5cc169165"
+                       :redirect_uri "https://www.example.com/callback" :client_id "5fe01282e44241328a84e7c5cc169165"
                        :client_secret "123456789secret"})
 
 (def test-form-params-refresh {:grant_type "refresh_token"
@@ -85,7 +81,7 @@
  
 (def several-providers-final-state-map
   {:example final-state-map})
- 
+
 (defn reset
   "Reset the state a of our app before calling test f."
   [f]
@@ -101,8 +97,6 @@
 (defn reset-channels
   []
   "Reset our interaction and code channels to be able to start fresh."
-  (drain! lma/params-chan)
-  (drain! lma/state-chan)
   (drain! lma/interaction-chan))
 
 

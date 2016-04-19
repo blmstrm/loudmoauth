@@ -9,13 +9,20 @@
 
 (def interaction-chan (a/chan))
 
-(def state-chan (a/chan))
-
 (def app-state (atom {}))
 
 (def query-params [:client-id :response-type :redirect-uri :scope :state])
 
+(def provider->state (atom {}))
+
 (declare get-tokens)
+
+(defn match-code-to-provider
+  [params]
+  (let [state (:state params)
+       code (:code params)
+       current-provider-data (state @app-state)]
+    (deliver (:code current-provider-data) code)))
 
 (defn query-param-string 
   "Get query-param string from query parameter map."
@@ -34,15 +41,15 @@
 (defn add-state
   "Adds unique state-id to state map provider-auth-data."
   [provider-auth-data]
-  (assoc provider-auth-data :state (lmutil/uuid)))
+  (let [state (lmutil/uuid)]
+  (assoc provider-auth-data :state state)))
 
 ;Wait here for your code, promise?
 ;The last line, when :code is populated, Execute!
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."
   [provider-auth-data]
-  (a/go (a/>! interaction-chan (:auth-url provider-auth-data)))
-  (assoc provider-auth-data :code (:code (a/<!! state-chan))))
+  (a/go (a/>! interaction-chan (:auth-url provider-auth-data))))
 
 ;TODO - Refactor this one.
 (defn create-form-params
@@ -50,7 +57,7 @@
   [provider-auth-data]
   (if-not (:refresh_token provider-auth-data)
     {:grant_type "authorization_code" 
-     :code (:code provider-auth-data)
+     :code @(:code provider-auth-data)
      :redirect_uri (:redirect-uri provider-auth-data)
      :client_id (:client-id provider-auth-data)
      :client_secret (:client-secret provider-auth-data)}
@@ -73,6 +80,7 @@
     (lmutil/parse-json-from-response-body)
     (add-tokens-to-state-map provider-auth-data)))
 
+;Put this on future as we might be waiting for our promise.
 (defn create-query-data
   "Creates quert data for use in http post call when retreiving tokens."
   [provider-auth-data]
@@ -140,19 +148,27 @@
     (build-auth-url)
     (fetch-code)))
 
+(defn create-code-promise
+  "Initiate promise for future code"
+  [provider-auth-data]
+  (assoc provider-auth-data :code (promise)))
+
 (defn init-provider
   [provider-auth-data]
+  (a/go
   (->>
     provider-auth-data
+    (create-code-promise)
     (request-access-to-data)
-    (request-access-and-refresh-tokens)))  
+    (request-access-and-refresh-tokens))))  
 
 (defn init-one
   "Init one provider based on provider name."
   [provider]
+  (let [state (provider @provider->state)]
   (->>
-  (init-provider (provider @app-state))
-  (swap! app-state update-in [provider] @app-state)))
+  (init-provider (state @app-state))
+  (swap! app-state update-in [state] @app-state))))
 
 (defn init-all
   "Init all providers stored in app."

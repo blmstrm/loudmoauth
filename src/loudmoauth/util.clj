@@ -1,5 +1,5 @@
 (ns loudmoauth.util
- (:require [clojure.data.codec.base64 :as b64]
+  (:require [clojure.data.codec.base64 :as b64]
             [clojure.data.json :as json]
             [clojure.string :as str]))
 
@@ -16,15 +16,17 @@
           new-keys (map #(keyword (str/replace (name %) "-" "_")) ks)]
       (zipmap new-keys vs))))
 
- (defn string-to-base64-string
+(defn string-to-base64-string
   "b64 encode string"
   [original]
   (String. (b64/encode (.getBytes original)) "UTF-8"))
 
- (defn parse-json-from-response-body
+(defn parse-json-from-response-body
   "Parse json in response body"
   [response-body]
   (json/read-str response-body :key-fn keyword))
 
-
- 
+(defn provider-reverse-lookup
+  "Performs a reverse look up on provider value and returns the first result found."
+  [provider m]
+  (some #(if (= provider (:provider %)) %) (vals m)))
