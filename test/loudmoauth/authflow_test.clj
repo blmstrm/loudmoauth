@@ -4,10 +4,14 @@
             [loudmoauth.util :as lmu]
             [loudmoauth.test-fixtures :as tf]
             [clojure.core.async :as a]))
- 
-(use-fixtures :each tf/reset)
 
-(def chans (list params-chan interaction-chan))
+;TODO - test-create-query-data
+;TODO - test-create-form-params
+;TODO - test-fetch-code
+;TODO - test-init-all
+;TODO - test-init-one 
+;TODO - test-init-provider 
+(use-fixtures :each tf/reset)
 
 (deftest test-generate-query-param-string
   (testing "Testing generation of query param string with and without :other key"

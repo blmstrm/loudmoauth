@@ -6,6 +6,9 @@
             [loudmoauth.authflow :as lma]
             [clojure.core.async :as a]))
 
+;TODO - test-parse-params
+;TODO - test-init
+;TODO - test-set-oauth-params
 (use-fixtures :each tf/reset)
 
 (deftest test-parse-params

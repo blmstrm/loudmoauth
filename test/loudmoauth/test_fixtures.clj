@@ -9,6 +9,7 @@
 
 (def test-encoded-string "SSdtIGdsYWQgSSB3b3JlIHRoZXNlIHBhbnRzLg==")
 
+;TODO - :code should be a promise here.
 (def test-form-params-auth {:grant_type "authorization_code"
                        :code "abcdefghijklmn123456789"
                        :redirect_uri "https://www.example.com/callback" :client_id "5fe01282e44241328a84e7c5cc169165"
