@@ -53,7 +53,7 @@
    :state "34fFs29kd09"
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
-   :code "abcdefghijklmn123456789"
+   :code (promise)
    :provider :example
    })
 
@@ -68,7 +68,7 @@
    :state "34fFs29kd09"
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
-   :code "abcdefghijklmn123456789"
+   :code (promise)
    :token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil} 
    :access_token "a12dkdirnc"
    :refresh_token "sdscgrrf343"
@@ -87,6 +87,8 @@
   "Reset the state a of our app before calling test f."
   [f]
   (reset! lma/app-state {})
+  (deliver (:code final-state-map) "abcdefghijklmn123456789")
+  (deliver (:code middle-state-map) "abcdefghijklmn123456789")
   (f))
 
 (defn drain!

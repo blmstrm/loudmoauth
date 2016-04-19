@@ -5,8 +5,6 @@
             [loudmoauth.test-fixtures :as tf]
             [clojure.core.async :as a]))
 
-;TODO - test-create-query-data
-;TODO - test-create-form-params
 ;TODO - test-fetch-code
 ;TODO - test-init-all
 ;TODO - test-init-one 
