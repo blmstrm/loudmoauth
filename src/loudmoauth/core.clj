@@ -3,11 +3,7 @@
             [loudmoauth.authflow :as lma]
             [loudmoauth.util :as util]))
 
-;We need to identify what provider we are coming from here? 
-;Together with the code do we get our state? That's our key so that's good.
-;We do get our state here. If state isn't present, what else can we use?
-;But how do we map a key to another key provided by our users. We need a map where we map user defined keys to our state ids.
-;Don't use a channel. Just do your mapping and be done.
+;Use channel here? Calling a function like this is so nesting.
 (defn parse-params
   "Parse parameters from http-response and put on channel."
   [response]
@@ -50,7 +46,7 @@
         (lma/add-response-type "code" params)
         params)
       (lma/add-state) 
-      #(swap! lma/app-state assoc (:state %) %))))
+      #(swap! lma/app-state assoc (keyword (:state %)) %))))
 
 ;Reverser match on provider name instead of state
 ;Here we either supply our key or don't. If no key, just return (first tokens)

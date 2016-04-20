@@ -3,13 +3,14 @@
             [loudmoauth.authflow :as lma]))
 
 
+(def test-state-value "34fFs29kd09")
+
 (def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09") 
 
 (def test-custom-param-query-param-string  "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09&show_dialog=true") 
 
 (def test-encoded-string "SSdtIGdsYWQgSSB3b3JlIHRoZXNlIHBhbnRzLg==")
 
-;TODO - :code should be a promise here.
 (def test-form-params-auth {:grant_type "authorization_code"
                        :code "abcdefghijklmn123456789"
                        :redirect_uri "https://www.example.com/callback" :client_id "5fe01282e44241328a84e7c5cc169165"
@@ -28,7 +29,8 @@
 
 (def test-query-data-refresh {:form-params test-form-params-refresh})
 
-(def test-code-http-response {:status 200 :headers {} :body {} :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil :params {:state "34fFs29kd09" :code "abcdefghijklmn123456789"}})
+(def test-code-http-response {:status 200 :headers {} :body {} :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil :params {:state test-state-value :code "abcdefghijklmn123456789"}})
+
 
 (def start-state-map
   {:base-url "https://www.example.com"
@@ -50,7 +52,7 @@
    :response-type "code"
    :redirect-uri "https://www.example.com/callback"
    :scope "user-read-private user-read-email"
-   :state "34fFs29kd09"
+   :state test-state-value
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
    :code (promise)
@@ -65,7 +67,7 @@
    :response-type "code"
    :redirect-uri "https://www.example.com/callback"
    :scope "user-read-private user-read-email"
-   :state "34fFs29kd09"
+   :state test-state-value
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
    :code (promise)
@@ -78,10 +80,10 @@
    :provider :example}) 
 
 (def several-providers-middle-state-map
-  {:example middle-state-map})
+  {(keyword test-state-value) middle-state-map})
  
 (def several-providers-final-state-map
-  {:example final-state-map})
+  {(keyword test-state-value) final-state-map})
 
 (defn reset
   "Reset the state a of our app before calling test f."

@@ -5,21 +5,17 @@
             [clojure.algo.generic.functor :as functor]
             [clj-http.client :as client]))
 
-(def params-chan (a/chan))
-
 (def interaction-chan (a/chan))
 
 (def app-state (atom {}))
 
 (def query-params [:client-id :response-type :redirect-uri :scope :state])
 
-(def provider->state (atom {}))
-
 (declare get-tokens)
 
 (defn match-code-to-provider
   [params]
-  (let [state (:state params)
+  (let [state (keyword (:state params))
        code (:code params)
        current-provider-data (state @app-state)]
     (deliver (:code current-provider-data) code)))
@@ -28,8 +24,7 @@
   "Get query-param string from query parameter map."
   [provider-auth-data]
   (->>
-    (:custom-query-params provider-auth-data)
-    (merge (select-keys provider-auth-data query-params))
+    (:custom-query-params provider-auth-data) (merge (select-keys provider-auth-data query-params))
     (lmutil/change-keys)
     (client/generate-query-string)))
 
@@ -44,8 +39,6 @@
   (let [state (lmutil/uuid)]
   (assoc provider-auth-data :state state)))
 
-;Wait here for your code, promise?
-;The last line, when :code is populated, Execute!
 (defn fetch-code
   "Fetch code to be used in call to fetch tokens."
   [provider-auth-data]
@@ -165,9 +158,12 @@
 (defn init-one
   "Init one provider based on provider name."
   [provider]
-  (let [state (provider @provider->state)]
+  (let [provider-data (lmutil/provider-reverse-lookup provider @app-state)
+        state (keyword (:state provider-data))
+        ]
   (->>
-  (init-provider (state @app-state))
+  provider-data
+  (init-provider)
   (swap! app-state update-in [state] @app-state))))
 
 (defn init-all
