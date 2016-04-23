@@ -1,7 +1,11 @@
 (ns loudmoauth.util
   (:require [clojure.data.codec.base64 :as b64]
             [clojure.data.json :as json]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clj-http.client :as client] 
+            [schema.core :as s]))
+
+(def query-params [:client-id :response-type :redirect-uri :scope :state])
 
 (defn uuid [] (str (java.util.UUID/randomUUID)))
 
@@ -25,8 +29,3 @@
   "Parse json in response body"
   [response-body]
   (json/read-str response-body :key-fn keyword))
-
-(defn provider-reverse-lookup
-  "Performs a reverse look up on provider value and returns the first result found."
-  [provider m]
-  (some #(if (= provider (:provider %)) %) (vals m)))

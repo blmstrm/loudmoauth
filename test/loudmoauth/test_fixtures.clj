@@ -5,6 +5,8 @@
 
 (def test-state-value "34fFs29kd09")
 
+(def test-state-value-keyword (keyword test-state-value))
+
 (def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09") 
 
 (def test-custom-param-query-param-string  "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09&show_dialog=true") 
@@ -26,11 +28,11 @@
 (def test-response-body-string "{\"access_token\":\"a12dkdirnc\",\"refresh_token\":\"sdscgrrf343\",\"expires_in\":1245}")
 
 (def test-query-data-auth {:form-params test-form-params-auth})
-
 (def test-query-data-refresh {:form-params test-form-params-refresh})
 
 (def test-code-http-response {:status 200 :headers {} :body {} :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil :params {:state test-state-value :code "abcdefghijklmn123456789"}})
 
+(def test-state-code-params (:params test-code-http-response))
 
 (def start-state-map
   {:base-url "https://www.example.com"
@@ -55,7 +57,6 @@
    :state test-state-value
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
-   :code (promise)
    :provider :example
    })
 
@@ -80,10 +81,10 @@
    :provider :example}) 
 
 (def several-providers-middle-state-map
-  {(keyword test-state-value) middle-state-map})
+  {test-state-value-keyword middle-state-map})
  
 (def several-providers-final-state-map
-  {(keyword test-state-value) final-state-map})
+  {test-state-value-keyword final-state-map})
 
 (defn reset
   "Reset the state a of our app before calling test f."

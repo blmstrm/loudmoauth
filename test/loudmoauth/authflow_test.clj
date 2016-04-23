@@ -65,7 +65,7 @@
        ( with-redefs [clj-http.client/post (constantly (:token-response tf/final-state-map))]
      (is (= tf/final-state-map (dissoc (request-access-and-refresh-tokens (dissoc tf/final-state-map [:access_token :refresh_token :expires_in])) :token-refresher))))))
 
-  (deftest test-request-access-to-data
+(deftest test-request-access-to-data
     (testing "Build auth url and fetch code."
     (tf/reset-channels)
         (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map))]
@@ -73,7 +73,6 @@
 
 ;TODO - test-init-all
 ;TODO - test-init-one 
-;TODO - test-init-provider 
  
 (deftest test-init-provider
   (testing "Init a provider given the data."
@@ -88,11 +87,12 @@
     (reset! app-state tf/several-providers-middle-state-map)
     (tf/reset-channels)
     (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
-      (is (= tf/several-providers-final-state-map (update-in  (init-one :example) [:example] dissoc  :token-refresher))))))
+      (init-one :example)
+      (is (= tf/several-providers-final-state-map (update-in  (init-one :example) [tf/test-state-value-keyword] dissoc  :token-refresher))))))
 
 (deftest test-init-all
   (testing "Init all provider given the provider keyword."
     (reset! app-state tf/several-providers-middle-state-map)
     (tf/reset-channels)
     (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
-      (is (= tf/several-providers-final-state-map (update-in (init-all) [:example] dissoc :token-refresher))))))
+      (is (= tf/several-providers-final-state-map (update-in (init-all) [tf/test-state-value-keyword] dissoc :token-refresher))))))
