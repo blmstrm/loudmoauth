@@ -4,17 +4,17 @@
             [schema.core :as s]
             [loudmoauth.util :as util]))
 
-(def internal-provider-data
+(s/def internal-provider-data
   {:code s/Any
-   :expires_in  (s/either (s/atom s/Int) (s/atom nil))
-   :refresh_token (s/either (s/atom s/Str) (s/atom nil))
-   :access_token (s/either (s/atom s/Str) (s/atom nil))
+   :token-data {(s/required-key :expires_in)  (s/either (s/atom s/Int) (s/atom nil))
+                (s/required-key :refresh_token) (s/either (s/atom s/Str) (s/atom nil))
+                (s/required-key :access_token) (s/either (s/atom s/Str) (s/atom nil))}
    :state  s/Str
    :auth-url s/Str
    :respone-type  s/Str
    :token-url  s/Str})
 
-(def user-provider-data
+(s/def user-provider-data
   {:client-secret  s/Str
    :base-url s/Str
    :auth-endpoint s/Str
@@ -53,9 +53,10 @@
 (defn build-provider
   [provider-data]
   {:code (promise)
-   :expires_in (atom nil)
-   :refresh_token (atom nil)
-   :access_token (atom nil)
+   :token-data {
+                :expires_in (atom nil)
+                :refresh_token (atom nil)
+                :access_token (atom nil)}
    :state (util/uuid)
    :auth-url (auth-url provider-data)
    :response-type  "code"
@@ -64,7 +65,7 @@
 (defn create-new-provider
   [new-provider-data]
   (let [validated-user-data (s/validate user-provider-data new-provider-data)
-        validated-internal-data (s/validate internal-provider-data (build-provider validated-user-data))  ] 
+        validated-internal-data (s/validate internal-provider-data (build-provider validated-user-data))] 
     (merge validated-user-data validated-internal-data)))
 
 
