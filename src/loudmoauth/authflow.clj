@@ -37,12 +37,11 @@
       {:grant_type "refresh_token"
        :refresh_token (:refresh_token provider-data)})))
 
-;TODO - Swap on all three values.
-; We have {:token-data {:access_token "s" :refresh_token "as" :expires_in 231}}
-(defn add-tokens-to-state-map
+(defn add-tokens-to-provider-data
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
   [provider-data parsed-body]
-  (merge provider-data (select-keys parsed-body [:access_token :refresh_token :expires_in])))
+  (swap! (:token-data provider-data) merge (select-keys parsed-body [:access_token :refresh_token :expires_in]))
+  provider-data)
 
 (defn parse-tokens
   "Parse access token and refresh-token from http response."
@@ -51,9 +50,8 @@
     (:token-response provider-data)
     :body 
     (lmutil/parse-json-from-response-body)
-    (add-tokens-to-state-map provider-data)))
+    (add-tokens-to-provider-data provider-data)))
 
-;Put this on future as we might be waiting for our promise.
 (defn create-query-data
   "Creates quert data for use in http post call when retreiving tokens."
   [provider-data]

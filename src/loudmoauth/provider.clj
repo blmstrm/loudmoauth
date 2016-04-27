@@ -6,9 +6,9 @@
 
 (s/def internal-provider-data
   {:code s/Any
-   :token-data {(s/required-key :expires_in)  (s/either (s/atom s/Int) (s/atom nil))
-                (s/required-key :refresh_token) (s/either (s/atom s/Str) (s/atom nil))
-                (s/required-key :access_token) (s/either (s/atom s/Str) (s/atom nil))}
+   :token-data (s/atom {(s/required-key :expires_in) (s/either s/Int nil)
+                        (s/required-key :refresh_token) (s/either s/Str nil)
+                        (s/required-key :access_token) (s/either s/Str nil)})
    :state  s/Str
    :auth-url s/Str
    :respone-type  s/Str
@@ -53,10 +53,9 @@
 (defn build-provider
   [provider-data]
   {:code (promise)
-   :token-data {
-                :expires_in (atom nil)
-                :refresh_token (atom nil)
-                :access_token (atom nil)}
+   :token-data (atom {:expires_in nil
+                      :refresh_token nil
+                      :access_token nil})
    :state (util/uuid)
    :auth-url (auth-url provider-data)
    :response-type  "code"
