@@ -1,7 +1,7 @@
 (ns loudmoauth.core
-  (:require [clojure.core.async :as a]
-            [loudmoauth.authflow :as lma]
-            [loudmoauth.util :as util]))
+  (:require [loudmoauth.authflow :as lma]
+            [clojure.core.async :as a]
+            [loudmoauth.provider :as p])) 
 
 ;Use channel here? Calling a function like this is so nesting.
 (defn parse-params
@@ -19,7 +19,7 @@
   a specific provider, calling it without arguments tries to update all keys."
   ([] (map lma/get-tokens lma/providers))
   ([provider]
-   (let [provider-data util/provider-reverse-lookup provider lma/providers]
+   (let [provider-data p/provider-reverse-lookup provider lma/providers]
      (lma/get-tokens provider-data))))
 
 (defn user-interaction
@@ -33,15 +33,21 @@
   "Adds provider based on user provided provider-data map and initiates chain
   of function calls to retrieve an oauth token."
   [provider-params]
-  (lma/)
-  )
+  (a/thread
+  (lma/init-and-add-provider (p/create-new-provider provider-params))))
 
-(defn delete-provider)
+;What if we delete a provider that's in the middle of updating?
+(defn delete-provider
+  "Remove provider and token data."
+  [provider]
+  (let [provider-data (p/provider-reverse-lookup provider lma/providers)
+        state (keyword (:state provider-data))]
+    (dissoc lma/providers state)))
 
-Reverser match on provider name instead of state
+;Reverser match on provider name instead of state
 ;Here we either supply our key or don't. If no key, just return (first tokens)
 (defn oauth-token
   "Retreive oauth token for use in authentication call"
-  ([provider]
-   (let [provider-data (util/provider-reverse-lookup provider lma/providers)]
-     (:access_token provider-data))))
+  [provider]
+  (let [provider-data (p/provider-reverse-lookup provider lma/providers)]
+    (:access_token provider-data)))

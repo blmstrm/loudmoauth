@@ -89,7 +89,6 @@
 (defn reset
   "Reset the state a of our app before calling test f."
   [f]
-  (reset! lma/app-state {})
   (deliver (:code final-state-map) "abcdefghijklmn123456789")
   (deliver (:code middle-state-map) "abcdefghijklmn123456789")
   (f))

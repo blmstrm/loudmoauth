@@ -10,12 +10,11 @@
 
 (declare get-tokens)
 
-;TODO - Deliver code
 (defn match-code-to-provider
   [params]
   (let [state (keyword (:state params))
-       code (:code params)
-       current-provider-data (state providers)]
+        code (:code params)
+        current-provider-data (state providers)]
     (deliver (:code current-provider-data) code)))
 
 (defn fetch-code!
@@ -40,8 +39,7 @@
 (defn add-tokens-to-provider-data
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
   [provider-data parsed-body]
-  (swap! (:token-data provider-data) merge (select-keys parsed-body [:access_token :refresh_token :expires_in]))
-  provider-data)
+  (swap! (:token-data provider-data) merge (select-keys parsed-body [:access_token :refresh_token :expires_in])))
 
 (defn parse-tokens
   "Parse access token and refresh-token from http response."
@@ -78,8 +76,8 @@
   (->>
     (client/post (:token-url provider-data) (create-query-data provider-data)) 
     (assoc provider-data :token-response)
-    (parse-tokens)
-    (launch-token-refresher)))
+    (parse-tokens))
+  (launch-token-refresher provider-data))
 
 (defn init-and-add-provider
   [provider-data]

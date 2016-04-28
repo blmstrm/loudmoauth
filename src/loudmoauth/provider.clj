@@ -15,15 +15,15 @@
    :token-url  s/Str})
 
 (s/def user-provider-data
-  {:client-secret  s/Str
-   :base-url s/Str
-   :auth-endpoint s/Str
-   :token-endpoint s/Str
-   :client-id  s/Str
-   (s/optional-key :custom-query-params) {s/Keyword s/Str} 
-   :provider  s/Keyword
-   :redirect-uri  s/Str
-   :scope   s/Str}) 
+  {(s/optional-key :custom-query-params) {s/keyword s/str} 
+   :auth-endpoint s/str
+   :base-url s/str
+   :client-id  s/str
+   :client-secret  s/str
+   :provider  s/keyword
+   :redirect-uri  s/str
+   :scope   s/str
+   :token-endpoint s/str}) 
 
 (def query-params [:client-id :response-type :redirect-uri :scope :state])
 
@@ -66,5 +66,3 @@
   (let [validated-user-data (s/validate user-provider-data new-provider-data)
         validated-internal-data (s/validate internal-provider-data (build-provider validated-user-data))] 
     (merge validated-user-data validated-internal-data)))
-
-
