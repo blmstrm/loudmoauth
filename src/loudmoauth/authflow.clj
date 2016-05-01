@@ -6,7 +6,7 @@
 
 (def interaction-chan (a/chan))
 
-(def providers {})
+(def providers (atom {}))
 
 (declare get-tokens)
 
@@ -39,9 +39,12 @@
 (defn add-tokens-to-provider-data
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
   [provider-data parsed-body]
-  (swap! (:token-data provider-data) merge (select-keys parsed-body [:access_token :refresh_token :expires_in])))
+ (dosync
+  (alter (:access_token provider-data) (:acess_token parsed-body))  
+  (alter (:refresh_token provider-data) (:refresh_token parsed-body))  
+  (alter (:expires_in provider-data) (:expires_in parsed-body))))
 
-(defn parse-tokens
+(defn parse-tokens!
   "Parse access token and refresh-token from http response."
   [provider-data]
   (->>
@@ -76,8 +79,12 @@
   (->>
     (client/post (:token-url provider-data) (create-query-data provider-data)) 
     (assoc provider-data :token-response)
-    (parse-tokens))
+    (parse-tokens!))
   (launch-token-refresher provider-data))
+
+(defn add-to-providers
+  [provider-data]
+  (swap! providers (assoc providers (:state provider-data))))
 
 (defn init-and-add-provider
   [provider-data]
@@ -85,4 +92,4 @@
   (->>
     provider-data
     (get-tokens)
-    (assoc providers (:state provider-data))))
+    (add-to-providers)))

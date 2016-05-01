@@ -4,26 +4,26 @@
             [schema.core :as s]
             [loudmoauth.util :as util]))
 
-(s/def internal-provider-data
+(def internal-provider-data
   {:code s/Any
-   :token-data (s/atom {(s/required-key :expires_in) (s/either s/Int nil)
-                        (s/required-key :refresh_token) (s/either s/Str nil)
-                        (s/required-key :access_token) (s/either s/Str nil)})
+   :expires_in (s/ref (s/either s/Int nil))
+   :refresh_token (s/ref (s/either s/Str nil))
+   :access_token (s/ref (s/either s/Str nil))
    :state  s/Str
    :auth-url s/Str
    :respone-type  s/Str
    :token-url  s/Str})
 
-(s/def user-provider-data
-  {(s/optional-key :custom-query-params) {s/keyword s/str} 
-   :auth-endpoint s/str
-   :base-url s/str
-   :client-id  s/str
-   :client-secret  s/str
-   :provider  s/keyword
-   :redirect-uri  s/str
-   :scope   s/str
-   :token-endpoint s/str}) 
+(def user-provider-data
+  {(s/optional-key :custom-query-params) {s/Keyword s/Str} 
+   :auth-endpoint s/Str
+   :base-url s/Str
+   :client-id  s/Str
+   :client-secret  s/Str
+   :provider  s/Keyword
+   :redirect-uri  s/Str
+   :scope   s/Str
+   :token-endpoint s/Str}) 
 
 (def query-params [:client-id :response-type :redirect-uri :scope :state])
 
@@ -53,9 +53,9 @@
 (defn build-provider
   [provider-data]
   {:code (promise)
-   :token-data (atom {:expires_in nil
-                      :refresh_token nil
-                      :access_token nil})
+   :expires_in (ref nil)
+   :refresh_token (ref nil)
+   :access_token (ref nil)
    :state (util/uuid)
    :auth-url (auth-url provider-data)
    :response-type  "code"

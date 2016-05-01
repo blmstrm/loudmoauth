@@ -58,6 +58,7 @@
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
    :provider :example
+   :code (promise)
    })
 
 (def final-state-map

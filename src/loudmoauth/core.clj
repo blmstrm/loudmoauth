@@ -40,14 +40,14 @@
 (defn delete-provider
   "Remove provider and token data."
   [provider]
-  (let [provider-data (p/provider-reverse-lookup provider lma/providers)
+  (let [provider-data (p/provider-reverse-lookup provider @lma/providers)
         state (keyword (:state provider-data))]
-    (dissoc lma/providers state)))
+      (swap! lma/providers #(dissoc @lma/providers state))))
 
 ;Reverser match on provider name instead of state
 ;Here we either supply our key or don't. If no key, just return (first tokens)
 (defn oauth-token
   "Retreive oauth token for use in authentication call"
   [provider]
-  (let [provider-data (p/provider-reverse-lookup provider lma/providers)]
+  (let [provider-data (p/provider-reverse-lookup provider @lma/providers)]
     (:access_token provider-data)))

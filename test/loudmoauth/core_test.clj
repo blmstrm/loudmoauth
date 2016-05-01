@@ -4,17 +4,15 @@
             [loudmoauth.test-fixtures :as tf]
             [loudmoauth.util :as lmutil]
             [loudmoauth.authflow :as lma]
+            [loudmoauth.provider :as p]
             [clojure.core.async :as a]))
 
-;TODO - test-parse-params
-;TODO - test-init
-;TODO - test-set-oauth-params
 (use-fixtures :each tf/reset)
 
 (deftest test-parse-params
   (testing "Test parsing of :code and :state in incoming request params."
     (parse-params tf/test-code-http-response)
-    (is (= (:code tf/final-state-map) (:code (lmutil/provider-reverse-lookup :example @lma/app-state))))))
+    (is (= (:code tf/final-state-map) @(:code (p/provider-reverse-lookup :example lma/providers))))))
 
 
 (deftest test-user-interaction
@@ -31,6 +29,4 @@
 
 (deftest test-oauth-token
   (testing "Retrieve oauth-token from state-map."
-    (reset! lma/app-state tf/several-providers-final-state-map)
     (is (= (:access_token tf/final-state-map) (oauth-token :example)))))
-
