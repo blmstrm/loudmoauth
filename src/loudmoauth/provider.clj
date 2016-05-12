@@ -6,12 +6,12 @@
 
 (def internal-provider-data
   {:code s/Any
-   :expires_in (s/ref (s/either s/Int nil))
-   :refresh_token (s/ref (s/either s/Str nil))
-   :access_token (s/ref (s/either s/Str nil))
+   :expires_in s/Any 
+   :refresh_token s/Any 
+   :access_token s/Any 
    :state  s/Str
    :auth-url s/Str
-   :respone-type  s/Str
+   :response-type  s/Str
    :token-url  s/Str})
 
 (def user-provider-data

@@ -8,13 +8,23 @@
   (testing "Performing a reverse lookup of provider data."
     (is (= tf/final-state-map (provider-reverse-lookup :example tf/several-providers-final-state-map)))))
 
-;(deftest test-query-param-string)
+(deftest test-query-param-string
+  (testing "Create a query param string from given query parameter map."
+    (is (= tf/test-custom-param-query-param-string (query-param-string tf/provider-data)))))
 
-;(deftest test-auth-url)
+(deftest test-auth-url
+  (testing "Create auth url from provider data."
+    (is (= tf/auth-url (auth-url tf/provider-data)))))
 
-;(deftest token-url)
+(deftest test-token-url
+  "Create token-url form provider data."
+  (is (= tf/token-url (token-url tf/provider-data))))
 
-;(deftest build-provider)
+(deftest test-build-provider
+  "Build a new provider from a provider data map"
+  (with-redefs [lmutil/uuid tf/test-uuid]
+ (is (= tf/built-provider (dissoc (build-provider tf/provider-data)  :code :expires_in :refresh_token :access_token)))))
 
-;(deftest create-new-provider)
-
+(deftest test-create-new-provider
+  "Create a new provider from user input data merged with internally created data. Validate data types."
+  (is (create-new-provider tf/new-provider-data)))

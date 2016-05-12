@@ -34,7 +34,11 @@
 
 (def test-state-code-params (:params test-code-http-response))
 
-(def start-state-map
+(def auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string))
+
+(def token-url "https://www.example.com/api/token") 
+
+(def new-provider-data
   {:base-url "https://www.example.com"
    :auth-endpoint "/authorize"
    :token-endpoint "/api/token"
@@ -43,10 +47,9 @@
    :scope "user-read-private user-read-email"
    :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
-   :provider :example
-   })
+   :provider :example})
 
-(def middle-state-map 
+(def provider-data
   {:base-url "https://www.example.com"
    :auth-endpoint "/authorize"
    :token-endpoint "/api/token"
@@ -59,7 +62,15 @@
    :client-secret "123456789secret"
    :provider :example
    :code (promise)
+   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
+   :token-url "https://www.example.com/api/token" 
    })
+
+(def built-provider
+  {:state test-state-value
+   :auth-url auth-url 
+   :response-type  "code"
+   :token-url token-url})
 
 (def final-state-map
   {:base-url "https://www.example.com"
@@ -77,12 +88,11 @@
    :access_token "a12dkdirnc"
    :refresh_token "sdscgrrf343"
    :expires_in 1245 
-   :token-url "https://www.example.com/api/token" 
    :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
    :provider :example}) 
 
-(def several-providers-middle-state-map
-  {test-state-value-keyword middle-state-map})
+(def several-providers-data
+  {test-state-value-keyword provider-data})
  
 (def several-providers-final-state-map
   {test-state-value-keyword final-state-map})
@@ -91,7 +101,7 @@
   "Reset the state a of our app before calling test f."
   [f]
   (deliver (:code final-state-map) "abcdefghijklmn123456789")
-  (deliver (:code middle-state-map) "abcdefghijklmn123456789")
+  (deliver (:code provider-data) "abcdefghijklmn123456789")
   (f))
 
 (defn drain!
@@ -105,4 +115,8 @@
   "Reset our interaction and code channels to be able to start fresh."
   (drain! lma/interaction-chan))
 
+(defn test-uuid
+  "Always return the same uuid for testin purposes."
+  []
+  test-state-value)
 
