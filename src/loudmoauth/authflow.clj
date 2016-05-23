@@ -14,7 +14,7 @@
   [params]
   (let [state (keyword (:state params))
         code (:code params)
-        current-provider-data (state providers)]
+        current-provider-data (state @providers)]
     (deliver (:code current-provider-data) code)))
 
 (defn fetch-code!
@@ -84,7 +84,7 @@
 
 (defn add-to-providers
   [provider-data]
-  (swap! providers (assoc providers (:state provider-data))))
+  (swap! providers (assoc @providers (:state provider-data))))
 
 (defn init-and-add-provider
   [provider-data]

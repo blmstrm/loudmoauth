@@ -38,6 +38,8 @@
 
 (def token-url "https://www.example.com/api/token") 
 
+(def code-params {:state test-state-value :code "abcdefghijklmn123456789"})
+
 (def new-provider-data
   {:base-url "https://www.example.com"
    :auth-endpoint "/authorize"
