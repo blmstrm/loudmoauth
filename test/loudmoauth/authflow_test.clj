@@ -10,10 +10,12 @@
   (testing "Match a given state and code to a certain provider."
     (with-redefs [providers (atom tf/several-providers-final-state-map)]  
       (match-code-to-provider tf/code-params)
-      (is (= (:code tf/code-params) @(:code ( (keyword tf/test-state-value)  @providers)))))))
+      (is (= (:code tf/code-params) @(:code ((keyword tf/test-state-value)  @providers)))))))
 
-
-;(deftest test-fetch-code!)
+(deftest test-fetch-code!
+  (testing "Test putting auth url on interaction channel.")
+  (fetch-code! (:auth-url tf/final-state-map))
+  (is (= (:auth-url tf/final-state-map) (a/<!! interaction-chan))))
 
 ;(deftest test-create-form-params
 ;  (testing "Creation of query parameter map to include in http body."

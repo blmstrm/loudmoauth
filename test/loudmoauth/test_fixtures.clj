@@ -2,7 +2,6 @@
   (:require [clojure.core.async :as a]
             [loudmoauth.authflow :as lma]))
 
-
 (def test-state-value "34fFs29kd09")
 
 (def test-state-value-keyword (keyword test-state-value))
