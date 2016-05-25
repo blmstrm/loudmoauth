@@ -73,7 +73,7 @@
    :response-type  "code"
    :token-url token-url})
 
-(def final-state-map
+(def final-provider-data
   {:base-url "https://www.example.com"
    :auth-endpoint "/authorize"
    :token-endpoint "/api/token"
@@ -95,13 +95,13 @@
 (def several-providers-data
   {test-state-value-keyword provider-data})
  
-(def several-providers-final-state-map
-  {test-state-value-keyword final-state-map})
+(def final-several-providers-data
+  {test-state-value-keyword final-provider-data})
 
 (defn reset
   "Reset the state a of our app before calling test f."
   [f]
-  (deliver (:code final-state-map) "abcdefghijklmn123456789")
+  (deliver (:code final-provider-data) "abcdefghijklmn123456789")
   (deliver (:code provider-data) "abcdefghijklmn123456789")
   (f))
 

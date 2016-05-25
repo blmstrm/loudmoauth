@@ -5,22 +5,23 @@
             [loudmoauth.test-fixtures :as tf]
             [clojure.core.async :as a]))
 
-;(deftest test-match-code-to-provider)
 (deftest test-match-code-to-provider
   (testing "Match a given state and code to a certain provider."
-    (with-redefs [providers (atom tf/several-providers-final-state-map)]  
+    (with-redefs [providers (atom tf/final-several-providers-data)]  
       (match-code-to-provider tf/code-params)
       (is (= (:code tf/code-params) @(:code ((keyword tf/test-state-value)  @providers)))))))
 
 (deftest test-fetch-code!
   (testing "Test putting auth url on interaction channel.")
-  (fetch-code! (:auth-url tf/final-state-map))
-  (is (= (:auth-url tf/final-state-map) (a/<!! interaction-chan))))
+  (fetch-code! (:auth-url tf/final-provider-data))
+  (is (= (:auth-url tf/final-provider-data) (a/<!! interaction-chan))))
 
-;(deftest test-create-form-params
-;  (testing "Creation of query parameter map to include in http body."
-;    (is (= tf/test-form-params-refresh (create-form-params tf/final-state-map)))
-;    (is (= tf/test-form-params-auth (create-form-params tf/middle-state-map)))))  
+(deftest test-create-form-params
+  (testing "Creation of query parameter map to include in http body."
+    (deliver (:code tf/provider-data) "abcdefghijklmn123456789")
+    (deliver (:code tf/final-provider-data) "abcdefghijklmn123456789")
+    (is (= tf/test-form-params-refresh (create-form-params tf/final-provider-data)))
+    (is (= tf/test-form-params-auth (create-form-params tf/provider-data)))))  
 
 ;(deftest test-add-tokens-to-provider-data)
 
