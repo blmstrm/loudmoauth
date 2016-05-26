@@ -29,20 +29,20 @@
     {:client_id (:client-id provider-data)
      :client_secret (:client-secret provider-data)
      }
-    (if-not (:refresh_token provider-data)
+    (if @(:refresh_token provider-data)
+      {:grant_type "refresh_token"
+       :refresh_token @(:refresh_token provider-data)}
       {:grant_type "authorization_code" 
        :code @(:code provider-data)
-       :redirect_uri (:redirect-uri provider-data)}
-      {:grant_type "refresh_token"
-       :refresh_token (:refresh_token provider-data)})))
+       :redirect_uri (:redirect-uri provider-data)})))
 
 (defn add-tokens-to-provider-data
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
   [provider-data parsed-body]
- (dosync
-  (alter (:access_token provider-data) (:acess_token parsed-body))  
-  (alter (:refresh_token provider-data) (:refresh_token parsed-body))  
-  (alter (:expires_in provider-data) (:expires_in parsed-body))))
+  (dosync
+    (alter (:access_token provider-data) :access_token parsed-body)  
+    (alter (:refresh_token provider-data) :refresh_token parsed-body )  
+    (alter (:expires_in provider-data) :expires_in parsed-body)))
 
 (defn parse-tokens!
   "Parse access token and refresh-token from http response."

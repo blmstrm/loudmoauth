@@ -40,57 +40,62 @@
 (def code-params {:state test-state-value :code "abcdefghijklmn123456789"})
 
 (def new-provider-data
-  {:base-url "https://www.example.com"
+  {:access_token (ref nil)
    :auth-endpoint "/authorize"
-   :token-endpoint "/api/token"
+   :base-url "https://www.example.com"
    :client-id "5fe01282e44241328a84e7c5cc169165"
-   :redirect-uri "https://www.example.com/callback"
-   :scope "user-read-private user-read-email"
-   :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
-   :provider :example})
+   :custom-query-params {:show-dialog "true"}
+   :expires_in (ref nil)
+   :provider :example
+   :redirect-uri "https://www.example.com/callback"
+   :refresh_token (ref nil)
+   :scope "user-read-private user-read-email"
+   :token-endpoint "/api/token"})
 
 (def provider-data
-  {:base-url "https://www.example.com"
+  {:access_token (ref nil)
    :auth-endpoint "/authorize"
-   :token-endpoint "/api/token"
+   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
+   :base-url "https://www.example.com"
    :client-id "5fe01282e44241328a84e7c5cc169165"
-   :response-type "code"
+   :client-secret "123456789secret"
+   :code (promise)
+   :custom-query-params {:show-dialog "true"}
+   :expires_in (ref nil)
+   :provider :example
    :redirect-uri "https://www.example.com/callback"
+   :refresh_token (ref nil)
+   :response-type "code"
    :scope "user-read-private user-read-email"
    :state test-state-value
-   :custom-query-params {:show-dialog "true"}
-   :client-secret "123456789secret"
-   :provider :example
-   :code (promise)
-   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
-   :token-url "https://www.example.com/api/token" 
-   })
+   :token-endpoint "/api/token"
+   :token-url "https://www.example.com/api/token"})
 
 (def built-provider
-  {:state test-state-value
-   :auth-url auth-url 
+  {:auth-url auth-url 
    :response-type  "code"
+   :state test-state-value
    :token-url token-url})
 
 (def final-provider-data
-  {:base-url "https://www.example.com"
+  {:access_token (ref "a12dkdirnc")
    :auth-endpoint "/authorize"
-   :token-endpoint "/api/token"
+   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
+   :base-url "https://www.example.com"
    :client-id "5fe01282e44241328a84e7c5cc169165"
-   :response-type "code"
-   :redirect-uri "https://www.example.com/callback"
-   :scope "user-read-private user-read-email"
-   :state test-state-value
-   :custom-query-params {:show-dialog "true"}
    :client-secret "123456789secret"
    :code (promise)
-   :token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil} 
-   :access_token "a12dkdirnc"
-   :refresh_token "sdscgrrf343"
-   :expires_in 1245 
-   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
-   :provider :example}) 
+   :custom-query-params {:show-dialog "true"}
+   :expires_in (ref 1245) 
+   :provider :example
+   :redirect-uri "https://www.example.com/callback"
+   :refresh_token (ref "sdscgrrf343")
+   :response-type "code"
+   :scope "user-read-private user-read-email"
+   :state test-state-value
+   :token-endpoint "/api/token"
+   :token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil}}) 
 
 (def several-providers-data
   {test-state-value-keyword provider-data})
