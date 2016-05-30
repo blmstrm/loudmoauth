@@ -70,6 +70,7 @@
    :scope "user-read-private user-read-email"
    :state test-state-value
    :token-endpoint "/api/token"
+   :token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil}   
    :token-url "https://www.example.com/api/token"})
 
 (def built-provider

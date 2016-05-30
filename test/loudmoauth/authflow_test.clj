@@ -20,17 +20,22 @@
   (testing "Creation of query parameter map to include in http body."
     (deliver (:code tf/provider-data) "abcdefghijklmn123456789")
     (deliver (:code tf/final-provider-data) "abcdefghijklmn123456789")
-    (is (= tf/test-form-params-refresh (create-form-params tf/final-provider-data)))
-    (is (= tf/test-form-params-auth (create-form-params tf/provider-data)))))  
+    (is (= tf/test-form-params-auth (create-form-params tf/provider-data)))
+    (is (= tf/test-form-params-refresh (create-form-params tf/final-provider-data)))))  
 
 (deftest test-add-tokens-to-provider-data
  (testing "Add access token, refresh token and expires in values to current provider."
    (add-tokens-to-provider-data tf/provider-data tf/test-parsed-body)
-   (= @(:access_token tf/provider-data) @(:access_token tf/final-provider-data))
-   (= @(:refresh_token tf/provider-data) @(:refresh_token tf/final-provider-data))
-   (= @(:expires_in tf/provider-data) @(:expires_in tf/final-provider-data))) )
+   (is (= @(:access_token tf/provider-data) @(:access_token tf/final-provider-data)))
+   (is  (= @(:refresh_token tf/provider-data) @(:refresh_token tf/final-provider-data)))
+   (is (= @(:expires_in tf/provider-data) @(:expires_in tf/final-provider-data)))))
 
-;(deftest test-parse-tokens!)
+(deftest test-parse-tokens!
+ (testing "Parses token information from response body."
+   (parse-tokens! tf/provider-data)
+   (is (= @(:access_token tf/provider-data) @(:access_token tf/final-provider-data)))
+   (is  (= @(:refresh_token tf/provider-data) @(:refresh_token tf/final-provider-data)))
+   (is (= @(:expires_in tf/provider-data) @(:expires_in tf/final-provider-data)))))
 
 ;(deftest test-create-query-data)
 

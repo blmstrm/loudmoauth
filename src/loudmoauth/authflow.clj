@@ -40,9 +40,9 @@
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
   [provider-data parsed-body]
   (dosync
-    (alter (:access_token provider-data) :access_token parsed-body)  
-    (alter (:refresh_token provider-data) :refresh_token parsed-body )  
-    (alter (:expires_in provider-data) :expires_in parsed-body)))
+    (ref-set (:access_token provider-data) (:access_token parsed-body))  
+    (ref-set (:refresh_token provider-data) (:refresh_token parsed-body))  
+    (ref-set (:expires_in provider-data) (:expires_in parsed-body))))
 
 (defn parse-tokens!
   "Parse access token and refresh-token from http response."
