@@ -26,6 +26,8 @@
 
 (def test-response-body-string "{\"access_token\":\"a12dkdirnc\",\"refresh_token\":\"sdscgrrf343\",\"expires_in\":1245}")
 
+(def token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil})   
+ 
 (def test-query-data-auth {:form-params test-form-params-auth})
 (def test-query-data-refresh {:form-params test-form-params-refresh})
 
@@ -70,7 +72,6 @@
    :scope "user-read-private user-read-email"
    :state test-state-value
    :token-endpoint "/api/token"
-   :token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil}   
    :token-url "https://www.example.com/api/token"})
 
 (def built-provider
@@ -96,7 +97,7 @@
    :scope "user-read-private user-read-email"
    :state test-state-value
    :token-endpoint "/api/token"
-   :token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil}}) 
+   :token-response test-token-response })
 
 (def several-providers-data
   {test-state-value-keyword provider-data})

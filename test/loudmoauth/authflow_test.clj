@@ -37,7 +37,6 @@
    (is  (= @(:refresh_token tf/provider-data) @(:refresh_token tf/final-provider-data)))
    (is (= @(:expires_in tf/provider-data) @(:expires_in tf/final-provider-data)))))
 
-;(deftest test-create-query-data)
 (deftest test-create-query-data
   (testing "Create query data map from provider data."
     (deliver (:code tf/provider-data) "abcdefghijklmn123456789")
@@ -45,6 +44,8 @@
                                             (is (=  tf/test-query-data-auth (create-query-data tf/provider-data)))
     (is (=  tf/test-query-data-refresh (create-query-data tf/final-provider-data)))))
 
+;TODO mock client/post, have it always return  test-token-response
 ;(deftest test-get-tokens)
+
 
 ;(deftest test-init-and-add-provider)
