@@ -70,8 +70,8 @@
   (when-let [token-refresher (:token-refresher provider-data)]
     (future-cancel token-refresher))
   (if-let [expiry-time (:expires_in provider-data)]
-    (assoc provider-data :token-refresher (token-refresher expiry-time provider-data))
-    provider-data))
+    (assoc provider-data :token-refresher (token-refresher expiry-time provider-data)))
+    provider-data)
 
 (defn get-tokens
   "Fetch tokens using crafted url" 
