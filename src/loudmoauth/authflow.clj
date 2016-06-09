@@ -73,11 +73,16 @@
     (assoc provider-data :token-refresher (token-refresher expiry-time provider-data)))
     provider-data)
 
+(defn http-post-for-tokens
+  [provider-data]
+  "Wrapper around http client post call."
+    (client/post (:token-url provider-data) (create-query-data provider-data)))
+
 (defn get-tokens
   "Fetch tokens using crafted url" 
   [provider-data]
   (->>
-    (client/post (:token-url provider-data) (create-query-data provider-data)) 
+    (http-post-for-tokens provider-data)
     (assoc provider-data :token-response)
     (parse-tokens!))
   (launch-token-refresher provider-data))

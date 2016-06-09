@@ -13,21 +13,21 @@
 (def test-encoded-string "SSdtIGdsYWQgSSB3b3JlIHRoZXNlIHBhbnRzLg==")
 
 (def test-form-params-auth {:grant_type "authorization_code"
-                       :code "abcdefghijklmn123456789"
-                       :redirect_uri "https://www.example.com/callback" :client_id "5fe01282e44241328a84e7c5cc169165"
-                       :client_secret "123456789secret"})
+                            :code "abcdefghijklmn123456789"
+                            :redirect_uri "https://www.example.com/callback" :client_id "5fe01282e44241328a84e7c5cc169165"
+                            :client_secret "123456789secret"})
 
 (def test-form-params-refresh {:grant_type "refresh_token"
-                       :refresh_token "sdscgrrf343"
-                       :client_id "5fe01282e44241328a84e7c5cc169165"
-                       :client_secret "123456789secret"})
+                               :refresh_token "sdscgrrf343"
+                               :client_id "5fe01282e44241328a84e7c5cc169165"
+                               :client_secret "123456789secret"})
 
 (def test-parsed-body {:access_token "a12dkdirnc" :refresh_token "sdscgrrf343" :expires_in 1245})
 
 (def test-response-body-string "{\"access_token\":\"a12dkdirnc\",\"refresh_token\":\"sdscgrrf343\",\"expires_in\":1245}")
 
-(def token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil})   
- 
+(def test-token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil})   
+
 (def test-query-data-auth {:form-params test-form-params-auth})
 (def test-query-data-refresh {:form-params test-form-params-refresh})
 
@@ -74,6 +74,9 @@
    :token-endpoint "/api/token"
    :token-url "https://www.example.com/api/token"})
 
+(def provider-data-with-token-response
+  (merge provider-data {:token-response test-token-response}))
+
 (def built-provider
   {:auth-url auth-url 
    :response-type  "code"
@@ -97,11 +100,11 @@
    :scope "user-read-private user-read-email"
    :state test-state-value
    :token-endpoint "/api/token"
-   :token-response test-token-response })
+   :token-response test-token-response})
 
 (def several-providers-data
   {test-state-value-keyword provider-data})
- 
+
 (def final-several-providers-data
   {test-state-value-keyword final-provider-data})
 
@@ -115,8 +118,8 @@
 (defn drain!
   [ch]
   (a/go-loop []
-           (when (a/poll! ch)
-             (recur))))
+             (when (a/poll! ch)
+               (recur))))
 
 (defn reset-channels
   []

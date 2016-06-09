@@ -32,10 +32,10 @@
 
 (deftest test-parse-tokens!
  (testing "Parses token information from response body."
-   (parse-tokens! tf/provider-data)
-   (is (= @(:access_token tf/provider-data) @(:access_token tf/final-provider-data)))
-   (is  (= @(:refresh_token tf/provider-data) @(:refresh_token tf/final-provider-data)))
-   (is (= @(:expires_in tf/provider-data) @(:expires_in tf/final-provider-data)))))
+   (parse-tokens! tf/provider-data-with-token-response)
+   (is (= @(:access_token tf/provider-data-with-token-response) @(:access_token tf/final-provider-data)))
+   (is  (= @(:refresh_token tf/provider-data-with-token-response) @(:refresh_token tf/final-provider-data)))
+   (is (= @(:expires_in tf/provider-data-with-token-response) @(:expires_in tf/final-provider-data)))))
 
 (deftest test-create-query-data
   (testing "Create query data map from provider data."
@@ -44,8 +44,10 @@
                                             (is (=  tf/test-query-data-auth (create-query-data tf/provider-data)))
     (is (=  tf/test-query-data-refresh (create-query-data tf/final-provider-data)))))
 
-;TODO mock client/post, have it always return  test-token-response
 ;(deftest test-get-tokens)
-
+(deftest test-get-tokens
+ (testing "Retrieve tokens from authentication server, parse the reply and add the token information to our provider-data,"
+  (with-redefs [http-post-for-tokens (fn [provider-data] tf/test-token-response)]
+   (is (= tf/final-provider-data (get-tokens tf/provider-data))))))
 
 ;(deftest test-init-and-add-provider)
