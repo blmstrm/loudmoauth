@@ -5,6 +5,9 @@
             [clojure.core.async :as a]))
 
 ;(deftest test-change-keys)
+(deftest test-change-keys
+  (testing "Change hyphen to underscore for keys in map."
+    (is (= {:test_key_1 "1" :test_key_2 "2"}) (change-keys {:test-key-1 "1" :test_key_2 "2"}))))
 
 (deftest test-string-to-base64-string
   (testing "Conversion from normal string to base64 encoded string."
