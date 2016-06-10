@@ -42,7 +42,7 @@
   [provider]
   (let [provider-data (p/provider-reverse-lookup provider @lma/providers)
         state (keyword (:state provider-data))]
-      (reset! lma/providers (dissoc @lma/providers state))))
+      (swap! lma/providers dissoc @lma/providers state)))
 
 ;Reverser match on provider name instead of state
 ;Here we either supply our key or don't. If no key, just return (first tokens)
