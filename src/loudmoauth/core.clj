@@ -42,7 +42,7 @@
   [provider]
   (let [provider-data (p/provider-reverse-lookup provider @lma/providers)
         state (keyword (:state provider-data))]
-      (swap! lma/providers #(dissoc @lma/providers state))))
+      (reset! lma/providers (dissoc @lma/providers state))))
 
 ;Reverser match on provider name instead of state
 ;Here we either supply our key or don't. If no key, just return (first tokens)
@@ -50,4 +50,4 @@
   "Retreive oauth token for use in authentication call"
   [provider]
   (let [provider-data (p/provider-reverse-lookup provider @lma/providers)]
-    (:access_token provider-data)))
+    @(:access_token provider-data)))
