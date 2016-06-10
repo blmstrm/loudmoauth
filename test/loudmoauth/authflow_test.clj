@@ -44,7 +44,6 @@
     (is (=  tf/test-query-data-auth (create-query-data tf/provider-data)))
     (is (=  tf/test-query-data-refresh (create-query-data tf/final-provider-data)))))
 
-;(deftest test-get-tokens)
 (deftest test-get-tokens
   (testing "Retrieve tokens from authentication server, parse the reply and add the token information to our provider-data,"
     (with-redefs [http-post-for-tokens (fn [provider-data] tf/test-token-response)]
@@ -53,4 +52,7 @@
    (is  (= @(:refresh_token tf/final-provider-data) @(:refresh_token tf/provider-data)))
    (is (= @(:expires_in tf/final-provider-data) @(:expires_in tf/provider-data))))))
 
-;(deftest test-init-and-add-provider)
+(deftest test-add-to-providers
+  (testing "Add provider-data to providers atom."
+    (add-to-providers tf/final-provider-data)
+    (is (= tf/final-several-providers-data) (tf/test-state-value-keyword @providers))))

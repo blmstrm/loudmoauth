@@ -89,7 +89,7 @@
 
 (defn add-to-providers
   [provider-data]
-  (swap! providers (assoc @providers (:state provider-data))))
+  (swap! providers (assoc @providers (:state provider-data) provider-data)))
 
 (defn init-and-add-provider
   [provider-data]
