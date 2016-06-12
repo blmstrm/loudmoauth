@@ -52,14 +52,14 @@
 
 (defn build-provider
   [provider-data]
-  (let [rtype "code"]
+  (let [rtype "code" state (util/uuid)]
   {:code (promise)
    :expires_in (ref nil)
    :refresh_token (ref nil)
    :access_token (ref nil)
-   :state (util/uuid)
+   :state state
    :response-type rtype
-   :auth-url (auth-url (merge provider-data {:response-type rtype}))
+   :auth-url (auth-url (merge provider-data {:response-type rtype :state state}))
    :token-url (token-url provider-data)}))
 
 (defn create-new-provider
