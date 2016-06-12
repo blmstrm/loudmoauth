@@ -52,17 +52,18 @@
 
 (defn build-provider
   [provider-data]
+  (let [rtype "code"]
   {:code (promise)
    :expires_in (ref nil)
    :refresh_token (ref nil)
    :access_token (ref nil)
    :state (util/uuid)
-   :auth-url (auth-url provider-data)
-   :response-type  "code"
-   :token-url (token-url provider-data)})
+   :response-type rtype
+   :auth-url (auth-url (merge provider-data {:response-type rtype}))
+   :token-url (token-url provider-data)}))
 
 (defn create-new-provider
   [new-provider-data]
   (let [validated-user-data (s/validate user-provider-data new-provider-data)
         validated-internal-data (s/validate internal-provider-data (build-provider validated-user-data))] 
-    (merge validated-user-data validated-internal-data)))
+     (merge validated-user-data validated-internal-data)))

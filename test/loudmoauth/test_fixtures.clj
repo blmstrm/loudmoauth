@@ -54,6 +54,10 @@
    :refresh_token (ref nil)
    :scope "user-read-private user-read-email"
    :token-endpoint "/api/token"})
+ 
+(def new-provider-data-from-user
+(dissoc new-provider-data :access_token :expires_in :refresh_token))
+
 
 (def provider-data
   {:access_token (ref nil)

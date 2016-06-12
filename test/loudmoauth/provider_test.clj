@@ -6,7 +6,7 @@
 
 (deftest test-provider-reverse-lookup
   (testing "Performing a reverse lookup of provider data."
-    (is (= tf/final-state-map (provider-reverse-lookup :example tf/several-providers-final-state-map)))))
+    (is (= tf/final-provider-data (provider-reverse-lookup :example tf/final-several-providers-data)))))
 
 (deftest test-query-param-string
   (testing "Create a query param string from given query parameter map."
@@ -27,4 +27,4 @@
 
 (deftest test-create-new-provider
   "Create a new provider from user input data merged with internally created data. Validate data types."
-  (is (create-new-provider tf/new-provider-data)))
+  (is (create-new-provider tf/new-provider-data-from-user)))

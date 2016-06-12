@@ -89,12 +89,12 @@
 
 (defn add-to-providers
   [provider-data]
-  (swap! providers (assoc @providers (:state provider-data) provider-data)))
+  (swap! providers merge @providers {(keyword (:state provider-data)) provider-data}))
 
 (defn init-and-add-provider
   [provider-data]
+  (add-to-providers provider-data)
   (fetch-code! (:auth-url provider-data))
   (->>
     provider-data
-    (get-tokens)
-    (add-to-providers)))
+    (get-tokens)))

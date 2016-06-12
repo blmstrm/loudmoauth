@@ -9,9 +9,10 @@
 
 (deftest test-parse-params
   (testing "Test parsing of :code and :state in incoming request params."
-    (deliver (:code tf/final-provider-data) "abcdefghijklmn123456789")
-    (parse-params tf/test-code-http-response)
-    (is (= (:code tf/final-provider-data) @(:code (p/provider-reverse-lookup :example lma/providers))))))
+    (deliver (:code (tf/test-state-value-keyword tf/final-several-providers-data)) "abcdefghijklmn123456789")
+    (with-redefs [lma/providers (atom tf/final-several-providers-data)]  
+      (parse-params tf/test-code-http-response)
+      (is (= @(:code tf/final-provider-data) @(:code (p/provider-reverse-lookup :example @lma/providers)))))))
 
 
 (deftest test-user-interaction
@@ -22,13 +23,13 @@
     (is (= (:auth-url tf/final-provider-data) (user-interaction))) 
     (is (= nil (user-interaction)))))
 
-;(deftest delete-provider)
 (deftest test-delete-provider
   (testing "Remove provider from providers"
-  (with-redefs [lma/providers (atom tf/final-several-providers-data)]
-  (delete-provider :example)  
-  (is (= {} @lma/providers)))))
+    (with-redefs [lma/providers (atom tf/final-several-providers-data)]
+      (delete-provider :example)  
+      (is (= {} @lma/providers)))))
 
 (deftest test-oauth-token
   (testing "Retrieve oauth-token from state-map."
-    (is (= (:access_token tf/final-provider-data) (oauth-token :example)))))
+    ( with-redefs [lma/providers (atom tf/final-several-providers-data)]  
+      (is (= @(:access_token tf/final-provider-data) (oauth-token :example))))))

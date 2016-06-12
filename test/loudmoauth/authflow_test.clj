@@ -55,4 +55,4 @@
 (deftest test-add-to-providers
   (testing "Add provider-data to providers atom."
     (add-to-providers tf/final-provider-data)
-    (is (= tf/final-several-providers-data) (tf/test-state-value-keyword @providers))))
+    (is (= tf/final-several-providers-data @providers))))
