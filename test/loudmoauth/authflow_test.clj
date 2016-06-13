@@ -4,104 +4,55 @@
             [loudmoauth.util :as lmu]
             [loudmoauth.test-fixtures :as tf]
             [clojure.core.async :as a]))
- 
-(use-fixtures :each tf/reset)
 
-(def chans (list code-chan interaction-chan))
+(deftest test-match-code-to-provider
+  (testing "Match a given state and code to a certain provider."
+    (with-redefs [providers (atom tf/final-several-providers-data)]  
+      (match-code-to-provider tf/code-params)
+      (is (= (:code tf/code-params) @(:code ((keyword tf/test-state-value)  @providers)))))))
 
-(deftest test-generate-query-param-string
-  (testing "Testing generation of query param string with and without :other key"
-    (is (= (query-param-string tf/final-state-map) tf/test-custom-param-query-param-string))
-    (is (= (query-param-string (dissoc tf/final-state-map :custom-query-params)) tf/test-query-param-string)))) 
-
-(deftest test-add-response-type
-  (testing "Testing addition of :response_type key to state map.")
-  (is (= (add-response-type "code" (dissoc tf/final-state-map :response-type)) tf/final-state-map)))
-
-(deftest test-add-state
-  (testing "Testing addition of :response_type key to state map.")
-  (with-redefs [lmu/uuid (fn [] "34fFs29kd09")]
-    (is (= (add-state (dissoc tf/final-state-map :state)) tf/final-state-map))))
-
-(deftest test-fetch-code
-  (testing "Test issuing http get for auth-code from oauth provider."
-   (tf/reset-channels)
-   (a/go (a/>! code-chan (:code tf/final-state-map)))
-   (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map))]
-      (is (= tf/final-state-map (fetch-code tf/final-state-map))))))
+(deftest test-fetch-code!
+  (testing "Test putting auth url on interaction channel.")
+  (fetch-code! (:auth-url tf/final-provider-data))
+  (is (= (:auth-url tf/final-provider-data) (a/<!! interaction-chan))))
 
 (deftest test-create-form-params
   (testing "Creation of query parameter map to include in http body."
-    (is (= tf/test-form-params-refresh (create-form-params tf/final-state-map)))
-    (is (= tf/test-form-params-auth (create-form-params tf/middle-state-map)))))  
+    (deliver (:code tf/provider-data) "abcdefghijklmn123456789")
+    (deliver (:code tf/final-provider-data) "abcdefghijklmn123456789")
+    (is (= tf/test-form-params-auth (create-form-params tf/provider-data)))
+    (is (= tf/test-form-params-refresh (create-form-params tf/final-provider-data)))))  
 
-(deftest test-add-tokens-to-state-map
-  (testing "Add tokens to state map."
-    (is (= tf/final-state-map (add-tokens-to-state-map (dissoc tf/final-state-map [:access_token :refresh_token :expires_in]) tf/test-parsed-body)))))
+(deftest test-add-tokens-to-provider-data
+ (testing "Add access token, refresh token and expires in values to current provider."
+   (add-tokens-to-provider-data tf/provider-data tf/test-parsed-body)
+   (is (= @(:access_token tf/provider-data) @(:access_token tf/final-provider-data)))
+   (is  (= @(:refresh_token tf/provider-data) @(:refresh_token tf/final-provider-data)))
+   (is (= @(:expires_in tf/provider-data) @(:expires_in tf/final-provider-data)))))
 
-(deftest test-parse-tokens
-  (testing "Parse response body from http response and parse tokens from response body add add to state map."
-    (is (= tf/final-state-map (parse-tokens (dissoc tf/final-state-map [:access_token :refresh_token :expires_in]))))))
+(deftest test-parse-tokens!
+ (testing "Parses token information from response body."
+   (parse-tokens! tf/provider-data-with-token-response)
+   (is (= @(:access_token tf/provider-data-with-token-response) @(:access_token tf/final-provider-data)))
+   (is  (= @(:refresh_token tf/provider-data-with-token-response) @(:refresh_token tf/final-provider-data)))
+   (is (= @(:expires_in tf/provider-data-with-token-response) @(:expires_in tf/final-provider-data)))))
 
-(deftest test-create-query-data 
-  (testing "Create query data to use in http post request for tokens."
-    (is (= tf/test-query-data-auth (create-query-data tf/middle-state-map)))
-    (is (= tf/test-query-data-refresh (create-query-data tf/final-state-map)))))
+(deftest test-create-query-data
+  (testing "Create query data map from provider data."
+    (deliver (:code tf/provider-data) "abcdefghijklmn123456789")
+    (deliver (:code tf/final-provider-data) "abcdefghijklmn123456789")
+    (is (=  tf/test-query-data-auth (create-query-data tf/provider-data)))
+    (is (=  tf/test-query-data-refresh (create-query-data tf/final-provider-data)))))
 
 (deftest test-get-tokens
-  (testing "Test retrieving tokens through http requests."
-       (with-redefs [clj-http.client/post (constantly (:token-response tf/final-state-map))]
-      (is (= tf/final-state-map (dissoc  (get-tokens (dissoc tf/final-state-map [:access_token :refresh_token :expires_in])) :token-refresher))))))
+  (testing "Retrieve tokens from authentication server, parse the reply and add the token information to our provider-data,"
+    (with-redefs [http-post-for-tokens (fn [provider-data] tf/test-token-response)]
+      (get-tokens tf/provider-data)
+   (is (= @(:access_token tf/final-provider-data) @(:access_token tf/provider-data)))
+   (is  (= @(:refresh_token tf/final-provider-data) @(:refresh_token tf/provider-data)))
+   (is (= @(:expires_in tf/final-provider-data) @(:expires_in tf/provider-data))))))
 
-(deftest test-token-url
-  (testing "Create token-url."
-    (is (= (:token-url tf/final-state-map) (token-url (dissoc tf/final-state-map :token-url))))))
-
-(deftest test-build-token-url
-  (testing "Add token-url to state map."
-    (is (= tf/final-state-map (build-token-url (dissoc tf/final-state-map [:token-url]))))))
-
-(deftest test-auth-url
-  (testing "Create auth-url."
-    (is (= (:auth-url tf/final-state-map) (auth-url (dissoc tf/final-state-map [:auth-url]))))))
-
-(deftest test-build-auth-url
-  (testing "Add token-url to state map."
-    (is (= tf/final-state-map (build-token-url (dissoc tf/final-state-map [:token-url]))))))
-
-(deftest test-request-access-and-refresh-tokens
-  (testing "Build url and retrieve tokens."
-       ( with-redefs [clj-http.client/post (constantly (:token-response tf/final-state-map))]
-     (is (= tf/final-state-map (dissoc (request-access-and-refresh-tokens (dissoc tf/final-state-map [:access_token :refresh_token :expires_in])) :token-refresher))))))
-
-  (deftest test-request-access-to-data
-    (testing "Build auth url and fetch code."
-    (tf/reset-channels)
-    (a/go (a/>! code-chan (:code tf/final-state-map)))
-        (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map))]
-       (is (= tf/final-state-map) (request-access-to-data (dissoc tf/final-state-map :code)))))) 
-
-(deftest test-init-provider
-  (testing "Init a provider given the data."
-    (reset! app-state tf/several-providers-middle-state-map)
-    (tf/reset-channels)
-    (a/go (a/>! code-chan (:code tf/final-state-map)))
-    (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
-      (is (= tf/final-state-map (dissoc (init-provider tf/middle-state-map) :token-refresher))))))
-
-;TODO - Also work out this test.
-(deftest test-init-one
-  (testing "Init a provider given the provider keyword."
-    (reset! app-state tf/several-providers-middle-state-map)
-    (tf/reset-channels)
-    (a/go (a/>! code-chan (:code tf/final-state-map)))
-    (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
-      (is (= tf/several-providers-final-state-map (update-in  (init-one :example) [:example] dissoc  :token-refresher))))))
-
-(deftest test-init-all
-  (testing "Init all provider given the provider keyword."
-    (reset! app-state tf/several-providers-middle-state-map)
-    (tf/reset-channels)
-    (a/go (a/>! code-chan (:code tf/final-state-map)))
-    (with-redefs [clj-http.client/get (constantly (:token-response tf/final-state-map)) clj-http.client/post  (constantly (:token-response tf/final-state-map))]
-      (is (= tf/several-providers-final-state-map (update-in (init-all) [:example] dissoc :token-refresher))))))
+(deftest test-add-to-providers
+  (testing "Add provider-data to providers atom."
+    (add-to-providers tf/final-provider-data)
+    (is (= tf/final-several-providers-data @providers))))
