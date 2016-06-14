@@ -15,6 +15,18 @@ Require `loudmoauth` in your application:
 ```
 Start with creating a map with the specific parameters regarding your oauth2 service provider:
   ```Clojure
+(def spotify-oauth2-params
+  {:base-url "https://accounts.spotify.com"
+   :auth-endpoint "/authorize"
+   :token-endpoint "/api/token"
+   :client-id (System/getenv "SPOTIFY_OAUTH2_CLIENT_ID")
+   :redirect-uri "http://localhost:3000/oauth2"
+   :scope "playlist-read-private user-follow-modify"
+   :custom-query-params {:show-dialog "true"}
+   :client-secret (System/getenv "SPOTIFY_OAUTH2_CLIENT_SECRET")
+   :provider :spotify})
+
+
   (def ouath-map {:base-url "https://www.example.com"
   :client-id "34jfkdl3...4fjdl2"
   :redirect-uri "https://www.example.com/callback"
@@ -22,15 +34,22 @@ Start with creating a map with the specific parameters regarding your oauth2 ser
   :custom-query-params {:likes-cake "Yes"}
   :client-secret "23dj2k3k23kd...2312323s2s"})
 ```
-Configure your http-request handler to call the function `parse-code` when the url  specified for `:redirect-uri` is called. The example below uses a ring handler:
-
-Pass the map specified earlier as an argument to the `set-oauth-params` function.
+Configure your http-request handler to call the function `parse-params` when the url  specified for `:redirect-uri` is called. The example below uses a ring handler:
 ```Clojure
-(lmoauth/set-oauth-params oauth-map)
+(defn handler [request]
+  (condp = (:uri request)
+     "/oauth2" (lm/parse-params request)
+      "/interact"  (ringr/redirect (lm/user-interaction))  
+    {:status 200
+     :body (:uri request)}))
 ```
-To retrieve your token call the `token` function.
+Pass the map specified earlier as an argument to the `add-provider` function.
 ```Clojure
-(lmouath/token)
+(lmoauth/add-provider spotify-oauth2-params)
+```
+To retrieve your token call the `oauth-token` function with the keyword for the provider that you specified in your parameter map earlier:
+```Clojure
+(lmouath/oauth-token :spotify)
 ```
 This should be it. For a more detailed explanation see below. For working examples see the repository [loudmoauth-examples](https://github.com/blmstrm/loudmoauth-examples).
 
