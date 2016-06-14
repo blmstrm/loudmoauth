@@ -13,7 +13,7 @@ Require `loudmoauth` in your application:
 (ns my-app.core
   (:require [loudmoauth.core :as lmoauth]))
 ```
-Start with creating a map with the specific parameters regarding your oauth2 service provider:
+Start with creating a map with the specific parameters regarding your oauth2 service provider, here Spotify is used an example. Observer that I've stashed the client id and secret in system variables but that is up to the user:
   ```Clojure
 (def spotify-oauth2-params
   {:base-url "https://accounts.spotify.com"
@@ -25,16 +25,8 @@ Start with creating a map with the specific parameters regarding your oauth2 ser
    :custom-query-params {:show-dialog "true"}
    :client-secret (System/getenv "SPOTIFY_OAUTH2_CLIENT_SECRET")
    :provider :spotify})
-
-
-  (def ouath-map {:base-url "https://www.example.com"
-  :client-id "34jfkdl3...4fjdl2"
-  :redirect-uri "https://www.example.com/callback"
-  :scope "do-one-thing do-another-thing"
-  :custom-query-params {:likes-cake "Yes"}
-  :client-secret "23dj2k3k23kd...2312323s2s"})
 ```
-Configure your http-request handler to call the function `parse-params` when the url  specified for `:redirect-uri` is called. The example below uses a ring handler:
+Configure your http-request handler to call the function `parse-params` when the url  specified for `:redirect-uri` is called. The function `parse-params` expects a ring http response as input argument:
 ```Clojure
 (defn handler [request]
   (condp = (:uri request)
@@ -55,24 +47,30 @@ This should be it. For a more detailed explanation see below. For working exampl
 
 ##In-depth documentation
 ##oauth-params map
-###`:base-url`
-###`:client-id`
-###`:redirect-uri`
-###`:scope`
-###`:custom-query-params`
-###`:client-secret`
+`:base-url`
+`:auth-endpoint`
+`:token-endpoint` 
+`:client-id `
+`:redirect-uri` 
+`:scope`
+`:custom-query-params`
+`:client-secret`
+`:provider`
 
-##When the token expires
+##When/If the token expires
+When a new provider is added to the client
+
+##Removing tokens
 
 ##Exception handling
 
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2016 Karl Blomström
+	Copyright (c) 2016 Karl Blomström
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+	Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+	The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
