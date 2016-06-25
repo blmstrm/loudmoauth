@@ -13,7 +13,7 @@ Require `loudmoauth` in your application:
 (ns my-app.core
   (:require [loudmoauth.core :as lmoauth]))
 ```
-Start with creating a map with the specific parameters regarding your oauth2 service provider, here Spotify is used an example. Observer that I've stashed the client id and secret in system variables but that is up to the user:
+Start with creating a map with the specific parameters regarding your oauth2 service provider, here Spotify is used an example. Note that I've stashed the client id and secret in system variables but that is up to the user:
   ```Clojure
 (def spotify-oauth2-params
   {:base-url "https://accounts.spotify.com"
@@ -58,10 +58,16 @@ This should be it. For a more detailed explanation see below. For working exampl
 `:provider`
 
 ##When/If the token expires
-When a new provider is added to the client
+When a new provider is added to the client a separate thread will try to retrieve a new token when the current one is set to be expired. If, by coincidence, a request is sent to the API with the old token just as it expires the remote host will reply with a 403 http error message. To solve this it is a good idea to call the function `refresh-token` to force a refresh and then try the API request again.
+```Clojure
+(lmoauth/refresh-token :spotify)
+```
 
 ##Removing tokens
-
+To remove a token call the `remove-token` function with the provider keyword as an argument.
+```Clojure
+(lmoauth/remove-token :spotify)
+```
 ##Exception handling
 
 ## License
