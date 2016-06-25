@@ -63,10 +63,10 @@ When a new provider is added to the client a separate thread will try to retriev
 (lmoauth/refresh-token :spotify)
 ```
 
-##Removing tokens
-To remove a token call the `remove-token` function with the provider keyword as an argument.
+##Removing a provider 
+To remove a provider call the `delete-provider` function with the provider keyword as an argument.
 ```Clojure
-(lmoauth/remove-token :spotify)
+(lmoauth/delete-provider :spotify)
 ```
 ##Exception handling
 
