@@ -80,8 +80,6 @@ To remove a provider call the `delete-provider` function with the provider keywo
 ```Clojure
 (lmoauth/delete-provider :spotify)
 ```
-###Exception handling
-
 ## License
 The MIT License (MIT)
 
