@@ -3,10 +3,10 @@
 [![Coverage Status](https://coveralls.io/repos/github/blmstrm/loudmoauth/badge.svg?branch=master)](https://coveralls.io/github/blmstrm/loudmoauth?branch=master)
 [![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
 #Loudmoauth
-Loudmoauth is a general ouath2 client library. 
+Loudmoauth is a single user multi provider ouath2 client library. It's been built with single user access to several different providers as it's main focus.
 
 ##Quickstart
-To use `loudmoauth` with Leiningen or Boot include `[loudmoauth.core "0.1.0"]`.
+To use `loudmoauth` with Leiningen or Boot include `[loudmoauth.core "0.1.1"]`.
 
 Require `loudmoauth` in your application:
 ```Clojure
@@ -46,9 +46,6 @@ To retrieve your token call the `oauth-token` function with the keyword for the 
 This should be it. For a more detailed explanation see below. For working examples see the repository [loudmoauth-examples](https://github.com/blmstrm/loudmoauth-examples).
 
 ##A bit more detail
-
-###Single user scenario vs. Multi user scenario
-
 ###oauth-params map
 To configure each provider one needs to provide a map of parameters describing the oauth-service. They are as follows:
 
