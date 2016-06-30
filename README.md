@@ -47,9 +47,9 @@ This should be it. For a more detailed explanation see below. For working exampl
 
 ##A bit more detail
 ###oauth-params map
-To configure each provider one needs to provide a map of parameters describing the oauth-service. They are as follows:
+To configure each provider one needs to provide a map of parameters describing the oauth2 service. They are as follows:
 
-`:base-url` defines the root of the url of where our oauth api is located.  
+`:base-url` defines the root of the url of where our oauth2 api is located.  
 
 `:auth-endpoint` defines the part that has to be added to the `:base-url` create the full authorization url.
 
@@ -61,7 +61,7 @@ To configure each provider one needs to provide a map of parameters describing t
 
 `:scope` defines the rights your appplication is requesting from the user. This has to be a string where the different rights are separated by space.
 
-`:custom-query-params` defines the custom query parameters that some providers use to enable behaviour specific to their oauth2 service.
+`:custom-query-params` an optional key that defines the custom query parameters that some providers use to enable behaviour specific to their oauth2 service.
 
 `:client-secret ` defines the client secret received when registrating your application with the provider.
 
