@@ -30,8 +30,8 @@ Configure your http-request handler to call the function `parse-params` when the
 ```Clojure
 (defn handler [request]
   (condp = (:uri request)
-     "/oauth2" (lm/parse-params request)
-      "/interact"  (ringr/redirect (lm/user-interaction))  
+     "/oauth2" (lmoauth/parse-params request)
+      "/interact"  (ringr/redirect (lmoauth/user-interaction))  
     {:status 200
      :body (:uri request)}))
 ```
