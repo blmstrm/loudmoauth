@@ -39,6 +39,8 @@ Pass the map specified earlier as an argument to the `add-provider` function.
 ```Clojure
 (lmoauth/add-provider spotify-oauth2-params)
 ```
+Now visit the url that will trigger a call to `lm/user-interaction`, in our case `http://localhost:3000/interact`. If everything has worked as expected on the provider side you should now see the providers authentication page. Authenticate with the provider and they should provide you with the oauth2 tokens.
+
 To retrieve your token call the `oauth-token` function with the keyword for the provider that you specified in your parameter map earlier:
 ```Clojure
 (lmouath/oauth-token :spotify)
