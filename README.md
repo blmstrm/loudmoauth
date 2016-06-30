@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/blmstrm/loudmoauth/badge.svg?branch=master)](https://coveralls.io/github/blmstrm/loudmoauth?branch=master)
 [![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
 #Loudmoauth
-Loudmoauth is a single user multi provider ouath2 client library. It's been built with single user access to several different providers as it's main focus.
+Loudmoauth is a single user multi provider ouath2 client library. It's been built with single user access to several different providers as its main focus.
 
 ##Quickstart
 To use `loudmoauth` with Leiningen or Boot include `[loudmoauth.core "0.1.1"]`.
@@ -49,14 +49,22 @@ This should be it. For a more detailed explanation see below. For working exampl
 ###oauth-params map
 To configure each provider one needs to provide a map of parameters describing the oauth-service. They are as follows:
 
-`:base-url` defines the root of the url of where our oauth api is located.
+`:base-url` defines the root of the url of where our oauth api is located.  
+
 `:auth-endpoint` defines the part that has to be added to the `:base-url` create the full authorization url.
-`:token-endpoint` defines the part that to be added to the `:base-url` to create the full token retrival url.
+
+`:token-endpoint` defines the part that to be added to the `:base-url` to create the full token retrival url
+.
 `:client-id ` defines the client ID received when registrating your application with the provider.
+
 `:redirect-uri` defines the callback url to which the provider should make a http request when the user has authenticated through the provider.
+
 `:scope` defines the rights your appplication is requesting from the user. This has to be a string where the different rights are separated by space.
+
 `:custom-query-params` defines the custom query parameters that some providers use to enable behaviour specific to their oauth2 service.
+
 `:client-secret ` defines the client secret received when registrating your application with the provider.
+
 `:provider` defines an arbitrary name to help you identify this provider and it's tokens.
 
 ###When/If the token expires
