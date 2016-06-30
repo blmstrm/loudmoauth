@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/blmstrm/loudmoauth/badge.svg?branch=master)](https://coveralls.io/github/blmstrm/loudmoauth?branch=master)
 [![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
 #Loudmoauth
-Loudmoauth is a single user multi provider ouath2 client library. It's been built with single user access to several different providers as its main focus.
+Loudmoauth is a single user multi provider oauth2 client library. It's been built with single user access to several different providers as its main focus.
 
 ##Quickstart
 To use `loudmoauth` with Leiningen or Boot include `[loudmoauth.core "0.1.1"]`.
