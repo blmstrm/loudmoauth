@@ -45,20 +45,22 @@ To retrieve your token call the `oauth-token` function with the keyword for the 
 ```
 This should be it. For a more detailed explanation see below. For working examples see the repository [loudmoauth-examples](https://github.com/blmstrm/loudmoauth-examples).
 
-##In-depth documentation
+##A bit more detail
 ##oauth-params map
-`:base-url`
-`:auth-endpoint`
-`:token-endpoint` 
-`:client-id `
-`:redirect-uri` 
-`:scope`
-`:custom-query-params`
-`:client-secret`
-`:provider`
+To configure each provider one needs to provide a map of parameters describing the oauth-service. They are as follows:
+
+`:base-url` defines the root of the url of where our oauth api is located.
+`:auth-endpoint` defines the part that has to be added to the `:base-url` create the full authorization url.
+`:token-endpoint` defines the part that to be added to the `:base-url` to create the full token retrival url.
+`:client-id ` defines the client ID received when registrating your application with the provider.
+`:redirect-uri` defines the callback url to which the provider should make a http request when the user has authenticated through the provider.
+`:scope` defines the rights your appplication is requesting from the user. This has to be a string where the different rights are separated by space.
+`:custom-query-params` defines the custom query parameters that some providers use to enable behaviour specific to their oauth2 service.
+`:client-secret ` defines the client secret received when registrating your application with the provider.
+`:provider` defines an arbitrary name to help you identify this provider and it's tokens.
 
 ##When/If the token expires
-When a new provider is added to the client a separate thread will try to retrieve a new token when the current one is set to be expired. If, by coincidence, a request is sent to the API with the old token just as it expires the remote host will reply with a 403 http error message. To solve this it is a good idea to call the function `refresh-token` to force a refresh and then try the API request again.
+When a new provider is added to the client a separate thread will try to retrieve a new token when the current one is set to be expired. If, by coincidence, a request is sent to the API with the old token just as it expires the remote host will reply with a 403 http error message. To solve this it is a good idea to call the function `refresh-token`, if you receive a 403 response, to force a refresh and then try the API request again.
 ```Clojure
 (lmoauth/refresh-token :spotify)
 ```
