@@ -46,7 +46,10 @@ To retrieve your token call the `oauth-token` function with the keyword for the 
 This should be it. For a more detailed explanation see below. For working examples see the repository [loudmoauth-examples](https://github.com/blmstrm/loudmoauth-examples).
 
 ##A bit more detail
-##oauth-params map
+
+###Single user scenario vs. Multi user scenario
+
+###oauth-params map
 To configure each provider one needs to provide a map of parameters describing the oauth-service. They are as follows:
 
 `:base-url` defines the root of the url of where our oauth api is located.
@@ -59,18 +62,18 @@ To configure each provider one needs to provide a map of parameters describing t
 `:client-secret ` defines the client secret received when registrating your application with the provider.
 `:provider` defines an arbitrary name to help you identify this provider and it's tokens.
 
-##When/If the token expires
+###When/If the token expires
 When a new provider is added to the client a separate thread will try to retrieve a new token when the current one is set to be expired. If, by coincidence, a request is sent to the API with the old token just as it expires the remote host will reply with a 403 http error message. To solve this it is a good idea to call the function `refresh-token`, if you receive a 403 response, to force a refresh and then try the API request again.
 ```Clojure
 (lmoauth/refresh-token :spotify)
 ```
 
-##Removing a provider 
+###Removing a provider 
 To remove a provider call the `delete-provider` function with the provider keyword as an argument.
 ```Clojure
 (lmoauth/delete-provider :spotify)
 ```
-##Exception handling
+###Exception handling
 
 ## License
 The MIT License (MIT)
