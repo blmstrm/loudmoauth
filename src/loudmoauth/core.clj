@@ -16,12 +16,15 @@
 (defn refresh-token
   "In case of emergency token refresh, call this function with provider keyword to update
   a specific provider, calling it without arguments tries to update all keys."
-  ([] (map lma/get-tokens lma/providers))
   ([provider]
    (let [provider-data (p/provider-reverse-lookup provider @lma/providers)]
-    (->> 
-     (lma/get-tokens provider-data)
-     (lma/add-to-providers))))) 
+     (if @(:refresh_token provider-data)
+       (->>
+         (lma/get-tokens provider-data)
+         (lma/add-to-providers))
+       (->>
+         (merge provider-data {:code (promise)})
+         (lma/init-and-add-provider)))))) 
 
 (defn user-interaction
   "Returns user interaction url if present, nil if not."
@@ -34,8 +37,7 @@
   "Adds provider based on user provided provider-data map and initiates chain
   of function calls to retrieve an oauth token."
   [provider-params]
-  (future
-  (lma/init-and-add-provider (p/create-new-provider provider-params))))
+    (lma/init-and-add-provider (p/create-new-provider provider-params)))
 
 ;What if we delete a provider that's in the middle of updating?
 (defn delete-provider
@@ -43,7 +45,7 @@
   [provider]
   (let [provider-data (p/provider-reverse-lookup provider @lma/providers)
         state (keyword (:state provider-data))]
-      (swap! lma/providers dissoc @lma/providers state)))
+    (swap! lma/providers dissoc @lma/providers state)))
 
 ;Reverser match on provider name instead of state
 ;Here we either supply our key or don't. If no key, just return (first tokens)

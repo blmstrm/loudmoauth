@@ -76,6 +76,9 @@
 (defn http-post-for-tokens
   [provider-data]
   "Wrapper around http client post call."
+  (print "---------")
+  (print "Token-url: " (:token-url provider-data) ".")
+ (print "Query data: " ( create-query-data provider-data) ".") 
     (client/post (:token-url provider-data) (create-query-data provider-data)))
 
 (defn get-tokens
@@ -93,8 +96,9 @@
 
 (defn init-and-add-provider
   [provider-data]
+  (future
   (add-to-providers provider-data)
   (fetch-code! (:auth-url provider-data))
   (->>
     provider-data
-    (get-tokens)))
+    (get-tokens))))
