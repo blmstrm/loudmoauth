@@ -4,8 +4,7 @@
 
 (def test-state-value "34fFs29kd09")
 
-(def test-state-value-keyword (keyword test-state-value))
-
+(def test-state-value-keyword (keyword test-state-value)) 
 (def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09") 
 
 (def test-custom-param-query-param-string  "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09&show_dialog=true") 
@@ -26,7 +25,7 @@
 
 (def test-response-body-string "{\"access_token\":\"a12dkdirnc\",\"refresh_token\":\"sdscgrrf343\",\"expires_in\":1245}")
 
-(def test-response-body-string-no-optionals "{\"access_token\":\"a12dkdirnc\"}")
+(def test-response-body-string-no-optionals "{\"access_token\":\"a12dkdirncc\"}")
 
 (def test-token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil})   
 
@@ -110,11 +109,17 @@
    :token-endpoint "/api/token"
    :token-response test-token-response})
 
+(def final-provider-data-no-optionals
+  (assoc (dissoc final-provider-data [:expires_in :refresh_token]) :access_token (ref (str (:access_token final-provider-data) "c"))))
+
 (def several-providers-data
   {test-state-value-keyword provider-data})
 
 (def final-several-providers-data
   {test-state-value-keyword final-provider-data})
+
+(def final-several-providers-data-no-optionals
+  {test-state-value-keyword final-provider-data-no-optionals})
 
 (defn reset
   "Reset the state a of our app before calling test f."

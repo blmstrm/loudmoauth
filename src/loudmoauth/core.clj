@@ -7,11 +7,10 @@
 (defn parse-params
   "Parse parameters from http-response and put on channel."
   [response]
-  (a/go
     (->>
       response 
       :params
-      (lma/match-code-to-provider))))
+      (lma/match-code-to-provider)))
 
 ;Reverser match on provider name instead of state
 (defn refresh-token
@@ -20,7 +19,9 @@
   ([] (map lma/get-tokens lma/providers))
   ([provider]
    (let [provider-data (p/provider-reverse-lookup provider @lma/providers)]
-     (lma/get-tokens provider-data))))
+    (->> 
+     (lma/get-tokens provider-data)
+     (lma/add-to-providers))))) 
 
 (defn user-interaction
   "Returns user interaction url if present, nil if not."
