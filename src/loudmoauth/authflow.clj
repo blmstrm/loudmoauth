@@ -1,10 +1,7 @@
 (ns loudmoauth.authflow
   (:require [loudmoauth.util :as lmutil]
             [clojure.string :as str]
-            [clojure.core.async :as a]
             [clj-http.client :as client]))
-
-(def interaction-chan (a/chan))
 
 (def providers (atom {}))
 
@@ -16,11 +13,6 @@
         code (:code params)
         current-provider-data (state @providers)]
     (deliver (:code current-provider-data) code)))
-
-(defn fetch-code!
-  "Fetch code to be used in call to fetch tokens."
-  [auth-url]
-  (a/go (a/>! interaction-chan auth-url)))
 
 (defn create-form-params
   "Create query-params map to include in http body."
@@ -76,9 +68,6 @@
 (defn http-post-for-tokens
   [provider-data]
   "Wrapper around http client post call."
-  (print "---------")
-  (print "Token-url: " (:token-url provider-data) ".")
- (print "Query data: " ( create-query-data provider-data) ".") 
     (client/post (:token-url provider-data) (create-query-data provider-data)))
 
 (defn get-tokens
@@ -98,7 +87,6 @@
   [provider-data]
   (future
   (add-to-providers provider-data)
-  (fetch-code! (:auth-url provider-data))
   (->>
     provider-data
     (get-tokens))))

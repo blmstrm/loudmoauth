@@ -4,6 +4,8 @@
             [loudmoauth.test-fixtures :as tf]
             [loudmoauth.util :as lmutil]))
 
+(use-fixtures :each tf/reset)
+
 (deftest test-provider-reverse-lookup
   (testing "Performing a reverse lookup of provider data."
     (is (= tf/final-provider-data (provider-reverse-lookup :example tf/final-several-providers-data)))))

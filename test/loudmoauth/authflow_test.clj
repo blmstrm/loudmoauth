@@ -2,19 +2,15 @@
   (:require [clojure.test :refer :all]
             [loudmoauth.authflow :refer :all]
             [loudmoauth.util :as lmu]
-            [loudmoauth.test-fixtures :as tf]
-            [clojure.core.async :as a]))
+            [loudmoauth.test-fixtures :as tf]))
+
+(use-fixtures :each tf/reset)
 
 (deftest test-match-code-to-provider
   (testing "Match a given state and code to a certain provider."
     (with-redefs [providers (atom tf/final-several-providers-data)]  
       (match-code-to-provider tf/code-params)
       (is (= (:code tf/code-params) @(:code ((keyword tf/test-state-value)  @providers)))))))
-
-(deftest test-fetch-code!
-  (testing "Test putting auth url on interaction channel.")
-  (fetch-code! (:auth-url tf/final-provider-data))
-  (is (= (:auth-url tf/final-provider-data) (a/<!! interaction-chan))))
 
 (deftest test-create-form-params
   (testing "Creation of query parameter map to include in http body."
@@ -48,9 +44,9 @@
   (testing "Retrieve tokens from authentication server, parse the reply and add the token information to our provider-data,"
     (with-redefs [http-post-for-tokens (fn [provider-data] tf/test-token-response)]
       (get-tokens tf/provider-data)
-   (is (= @(:access_token tf/final-provider-data) @(:access_token tf/provider-data)))
-   (is  (= @(:refresh_token tf/final-provider-data) @(:refresh_token tf/provider-data)))
-   (is (= @(:expires_in tf/final-provider-data) @(:expires_in tf/provider-data))))))
+      (is (= @(:access_token tf/final-provider-data) @(:access_token tf/provider-data)))
+      (is  (= @(:refresh_token tf/final-provider-data) @(:refresh_token tf/provider-data)))
+      (is (= @(:expires_in tf/final-provider-data) @(:expires_in tf/provider-data))))))
 
 (deftest test-add-to-providers
   (testing "Add provider-data to providers atom."

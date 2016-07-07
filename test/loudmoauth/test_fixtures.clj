@@ -1,6 +1,5 @@
 (ns loudmoauth.test-fixtures
-  (:require [clojure.core.async :as a]
-            [loudmoauth.authflow :as lma]))
+  (:require [loudmoauth.authflow :as lma]))
 
 (def test-state-value "34fFs29kd09")
 
@@ -124,20 +123,11 @@
 (defn reset
   "Reset the state a of our app before calling test f."
   [f]
-  (deliver (:code final-provider-data) "abcdefghijklmn123456789")
-  (deliver (:code provider-data) "abcdefghijklmn123456789")
-  (f))
-
-(defn drain!
-  [ch]
-  (a/go-loop []
-             (when (a/poll! ch)
-               (recur))))
-
-(defn reset-channels
-  []
-  "Reset our interaction and code channels to be able to start fresh."
-  (drain! lma/interaction-chan))
+  (f)
+   (dosync
+        (ref-set (:access_token provider-data) nil)  
+        (ref-set (:refresh_token provider-data) nil)  
+        (ref-set (:expires_in provider-data) nil)))
 
 (defn test-uuid
   "Always return the same uuid for testin purposes."

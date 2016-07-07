@@ -4,8 +4,9 @@
             [loudmoauth.test-fixtures :as tf]
             [loudmoauth.util :as lmutil]
             [loudmoauth.authflow :as lma]
-            [loudmoauth.provider :as p]
-            [clojure.core.async :as a]))
+            [loudmoauth.provider :as p]))
+
+(use-fixtures :each tf/reset)
 
 (deftest test-parse-params
   (testing "Test parsing of :code and :state in incoming request params."
@@ -29,10 +30,8 @@
 
 (deftest test-user-interaction
   (testing "Pull the url used for interaction from channel and publish on end point where hopefully browser is waiting. In the first test we have something on the channel, in the second one the channel is empty."
-    (tf/reset-channels)
-    (a/>!! lma/interaction-chan (:auth-url tf/final-provider-data))
-    (is (= (:auth-url tf/final-provider-data) (user-interaction))) 
-    (is (= nil (user-interaction)))))
+(with-redefs [lma/providers (atom tf/several-providers-data)]
+    (is (= (:auth-url tf/provider-data) (user-interaction))))))
 
 (deftest test-delete-provider
   (testing "Remove provider from providers"

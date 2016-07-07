@@ -1,6 +1,5 @@
 (ns loudmoauth.core
   (:require [loudmoauth.authflow :as lma]
-            [clojure.core.async :as a]
             [loudmoauth.provider :as p])) 
 
 ;Use channel here? Calling a function like this is so nesting.
@@ -29,9 +28,8 @@
 (defn user-interaction
   "Returns user interaction url if present, nil if not."
   []
-  (if-let [interaction-url (a/poll! lma/interaction-chan)]
-    interaction-url
-    nil))
+  (when-let [auth-url (:auth-url (some #(if-not @(:access_token %) %) (vals @lma/providers)))]
+    auth-url))
 
 (defn add-provider
   "Adds provider based on user provided provider-data map and initiates chain

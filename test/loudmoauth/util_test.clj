@@ -1,10 +1,10 @@
 (ns loudmoauth.util-test
   (:require [clojure.test :refer :all]
             [loudmoauth.util :refer :all]
-            [loudmoauth.test-fixtures :as tf]
-            [clojure.core.async :as a]))
+            [loudmoauth.test-fixtures :as tf]))
 
-;(deftest test-change-keys)
+(use-fixtures :each tf/reset)
+
 (deftest test-change-keys
   (testing "Change hyphen to underscore for keys in map."
     (is (= {:test_key_1 "1" :test_key_2 "2"}) (change-keys {:test-key-1 "1" :test_key_2 "2"}))))
