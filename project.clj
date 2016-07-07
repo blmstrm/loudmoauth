@@ -1,4 +1,4 @@
-(defproject loudmoauth "0.1.1"
+(defproject loudmoauth "0.1.2-LOCAL"
   :description "A general oauth2 client library."
   :url "http://github.com/blmstrm/loudmoauth"
   :license {:name "The MIT License (MIT)"

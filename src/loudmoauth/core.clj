@@ -19,7 +19,7 @@
   a specific provider, calling it without arguments tries to update all keys."
   ([] (map lma/get-tokens lma/providers))
   ([provider]
-   (let [provider-data p/provider-reverse-lookup provider lma/providers]
+   (let [provider-data (p/provider-reverse-lookup provider @lma/providers)]
      (lma/get-tokens provider-data))))
 
 (defn user-interaction
@@ -33,7 +33,7 @@
   "Adds provider based on user provided provider-data map and initiates chain
   of function calls to retrieve an oauth token."
   [provider-params]
-  (a/thread
+  (future
   (lma/init-and-add-provider (p/create-new-provider provider-params))))
 
 ;What if we delete a provider that's in the middle of updating?
