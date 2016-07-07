@@ -16,10 +16,15 @@
 
 (deftest test-refresh-token
   (testing "Test refresh of tokens. This is basically two call to get tokens but with one instance of provider-data where refresh_token is already present and second where it is not."
- (with-redefs [lma/http-post-for-tokens (fn [provider-data] tf/test-token-response)
-               lma/providers (atom tf/final-several-providers-data)]
-   (refresh-token :example)
-   (is (= @(:access_token tf/final-provider-data) (oauth-token :example))))))
+    (with-redefs [lma/http-post-for-tokens (fn [provider-data] tf/test-token-response)
+                  lma/providers (atom tf/final-several-providers-data)]
+      (refresh-token :example)
+      (is (= @(:access_token tf/final-provider-data) (oauth-token :example))))
+    
+    (with-redefs [lma/http-post-for-tokens (fn [provider-data] tf/test-token-response-no-optionals)
+                  lma/providers (atom tf/final-several-providers-data)]
+      (refresh-token :example)
+      (is (= @(:access_token tf/final-provider-data) (oauth-token :example))))) )
 
 (deftest test-user-interaction
   (testing "Pull the url used for interaction from channel and publish on end point where hopefully browser is waiting. In the first test we have something on the channel, in the second one the channel is empty."

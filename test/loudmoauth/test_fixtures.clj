@@ -26,9 +26,13 @@
 
 (def test-response-body-string "{\"access_token\":\"a12dkdirnc\",\"refresh_token\":\"sdscgrrf343\",\"expires_in\":1245}")
 
+(def test-response-body-string-no-optionals "{\"access_token\":\"a12dkdirnc\"}")
+
 (def test-token-response {:status 200 :headers {} :body test-response-body-string :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil})   
 
+(def test-token-response-no-optionals {:status 200 :headers {} :body test-response-body-string-no-optionals :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil})   
 (def test-query-data-auth {:form-params test-form-params-auth})
+
 (def test-query-data-refresh {:form-params test-form-params-refresh})
 
 (def test-code-http-response {:status 200 :headers {} :body {} :request-time 0 :trace-redirects ["https://www.example.com/api/token"] :orig-content-encoding nil :params {:state test-state-value :code "abcdefghijklmn123456789"}})
