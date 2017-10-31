@@ -2,10 +2,10 @@
 [![Clojars](https://img.shields.io/clojars/v/loudmoauth.svg)](http://clojars.org/loudmoauth)
 [![Coverage Status](https://coveralls.io/repos/github/blmstrm/loudmoauth/badge.svg?branch=master)](https://coveralls.io/github/blmstrm/loudmoauth?branch=master)
 [![Dependencies Status](https://jarkeeper.com/blmstrm/loudmoauth/status.svg)](https://jarkeeper.com/blmstrm/loudmoauth)
-#Loudmoauth
+# Loudmoauth
 Loudmoauth is a single user multi provider oauth2 client library. It's been built with single user access to several different providers as its main focus.
 
-##Quickstart
+## Quickstart
 To use `loudmoauth` with Leiningen or Boot include `[loudmoauth.core "0.1.1"]`.
 
 Require `loudmoauth` in your application:
@@ -47,8 +47,8 @@ To retrieve your token call the `oauth-token` function with the keyword for the 
 ```
 This should be it. For a more detailed explanation see below. For working examples see the repository [loudmoauth-examples](https://github.com/blmstrm/loudmoauth-examples).
 
-##A bit more detail
-###oauth-params map
+## A bit more detail
+### oauth-params map
 To configure each provider one needs to provide a map of parameters describing the oauth2 service. They are as follows:
 
 `:base-url` defines the root of the url of where our oauth2 api is located.  
@@ -69,13 +69,13 @@ To configure each provider one needs to provide a map of parameters describing t
 
 `:provider` defines an arbitrary name to help you identify this provider and it's tokens.
 
-###When/If the token expires
+### When/If the token expires
 When a new provider is added to the client a separate thread will try to retrieve a new token when the current one is set to be expired. If, by coincidence, a request is sent to the API with the old token just as it expires the remote host will reply with a 403 http error message. To solve this it is a good idea to call the function `refresh-token`, if you receive a 403 response, to force a refresh and then try the API request again.
 ```Clojure
 (lmoauth/refresh-token :spotify)
 ```
 
-###Removing a provider 
+### Removing a provider 
 To remove a provider call the `delete-provider` function with the provider keyword as an argument.
 ```Clojure
 (lmoauth/delete-provider :spotify)
