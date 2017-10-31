@@ -31,9 +31,12 @@
 (defn add-tokens-to-provider-data
   "Takes state-map a state and parsed response from http request. Adds access-token and refresh-token to state map."
   [provider-data parsed-body]
+  (prn provider-data)
+  (prn parsed-body)
   (dosync
     (ref-set (:access_token provider-data) (:access_token parsed-body))  
-    (ref-set (:refresh_token provider-data) (:refresh_token parsed-body))  
+    (when (:refresh_token parsed-body)
+      (ref-set (:refresh_token provider-data) (:refresh_token parsed-body)))  
     (ref-set (:expires_in provider-data) (:expires_in parsed-body))))
 
 (defn parse-tokens!
