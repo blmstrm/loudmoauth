@@ -43,7 +43,7 @@
 (defn auth-url
   "Build the authorization url."
   [provider-data]
-  (str (:base-url provider-data) (:auth-endpoint provider-data) "/?" (query-param-string provider-data)))
+  (str (:base-url provider-data) (:auth-endpoint provider-data) "?" (query-param-string provider-data)))
 
 (defn token-url
   "Build the url for retreieving tokens."
