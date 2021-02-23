@@ -1,6 +1,6 @@
-(defproject loudmoauth "0.1.3"
+(defproject loudmoauth "0.1.3-with-url-fix"
   :description "A single user multi provider oauth2 client library."
-  :url "http://github.com/blmstrm/loudmoauth"
+  :url "http://github.com/njerig/loudmoauth"
   :license {:name "The MIT License (MIT)"
             :url "http://opensource.org/licenses/MIT"}
   :plugins [[lein-cloverage "1.0.6"]]
