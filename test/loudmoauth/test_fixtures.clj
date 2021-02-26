@@ -4,9 +4,9 @@
 (def test-state-value "34fFs29kd09")
 
 (def test-state-value-keyword (keyword test-state-value)) 
-(def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09") 
+(def test-query-param-string "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private%20user-read-email&state=34fFs29kd09") 
 
-(def test-custom-param-query-param-string  "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private+user-read-email&state=34fFs29kd09&show_dialog=true") 
+(def test-custom-param-query-param-string  "client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcallback&scope=user-read-private%20user-read-email&state=34fFs29kd09&show_dialog=true") 
 
 (def test-encoded-string "SSdtIGdsYWQgSSB3b3JlIHRoZXNlIHBhbnRzLg==")
 
@@ -37,7 +37,7 @@
 
 (def test-state-code-params (:params test-code-http-response))
 
-(def auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string))
+(def auth-url (str "https://www.example.com/authorize?" test-custom-param-query-param-string))
 
 (def token-url "https://www.example.com/api/token") 
 
@@ -64,7 +64,7 @@
 (def provider-data
   {:access_token (ref nil)
    :auth-endpoint "/authorize"
-   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
+   :auth-url (str "https://www.example.com/authorize?" test-custom-param-query-param-string)
    :base-url "https://www.example.com"
    :client-id "5fe01282e44241328a84e7c5cc169165"
    :client-secret "123456789secret"
@@ -92,7 +92,7 @@
 (def final-provider-data
   {:access_token (ref "a12dkdirnc")
    :auth-endpoint "/authorize"
-   :auth-url (str "https://www.example.com/authorize/?" test-custom-param-query-param-string)
+   :auth-url (str "https://www.example.com/authorize?" test-custom-param-query-param-string)
    :base-url "https://www.example.com"
    :client-id "5fe01282e44241328a84e7c5cc169165"
    :client-secret "123456789secret"
