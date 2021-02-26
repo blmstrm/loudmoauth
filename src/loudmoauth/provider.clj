@@ -2,7 +2,9 @@
   (:require [clojure.string :as str]
             [clj-http.client :as client] 
             [schema.core :as s]
-            [loudmoauth.util :as util]))
+            [loudmoauth.util :as util]
+            [clojure.string :refer [replace]])
+  (:refer-clojure :exclude [replace]))
 
 (def internal-provider-data
   {:code s/Any
@@ -35,10 +37,10 @@
 (defn query-param-string 
   "Get query-param string from query parameter map."
   [provider-data]
-  (->>
-    (:custom-query-params provider-data) (merge (select-keys provider-data query-params))
-    (util/change-keys)
-    (client/generate-query-string)))
+  (replace (->> (:custom-query-params provider-data) 
+                (merge (select-keys provider-data query-params))
+                (util/change-keys)
+                (client/generate-query-string)) "+" "%20"))
 
 (defn auth-url
   "Build the authorization url."
