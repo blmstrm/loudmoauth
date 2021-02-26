@@ -6,6 +6,7 @@
 (defn parse-params
   "Parse parameters from http-response and put on channel."
   [response]
+    (clojure.pprint/pprint response)
     (->>
       response 
       :params
