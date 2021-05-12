@@ -1,4 +1,4 @@
-(defproject loudmoauth "0.1.3-with-url-fix-2"
+(defproject loudmoauth "0.1.4"
   :description "A single user multi provider oauth2 client library."
   :url "http://github.com/njerig/loudmoauth"
   :license {:name "The MIT License (MIT)"
