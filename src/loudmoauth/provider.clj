@@ -40,7 +40,7 @@
   (replace (->> (:custom-query-params provider-data) 
                 (merge (select-keys provider-data query-params))
                 (util/change-keys)
-                (client/generate-query-string)) "+" "&"))
+                (client/generate-query-string)) "+" "%20"))
 
 (defn auth-url
   "Build the authorization url."
